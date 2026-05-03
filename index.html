@@ -139,8 +139,9 @@ function back(step){
   next(step);
 }
 
-
 function generateProben(){
+
+alert("läuft");
 
 let mpField = document.getElementById("mp");
 
@@ -165,14 +166,12 @@ if(!container){
 
 container.innerHTML = "";
 
-console.log("Mischproben:", mp);
-alert("läuft");
-  
 for(let i=1; i<=mp; i++){
 
 let block = document.createElement("div");
 block.className = "box";
 
+/* 🔴 WICHTIG: KEIN onchange, KEIN komplexer String */
 block.innerHTML = `
 <h3>Mischprobe ${i}</h3>
 
@@ -218,15 +217,21 @@ Probenahmeart
 Besonderheiten<textarea id="bes_${i}"></textarea>
 
 Foto
-<input type="file" accept="image/*" onchange="saveImage(event, 'p${i}')">
+<input type="file" accept="image/*" id="file_${i}">
 <img id="img_p${i}">
-
 `;
 
 container.appendChild(block);
-  alert(block.innerHTML);
+
+/* 🔧 EVENT sauber nachträglich setzen */
+let fileInput = document.getElementById("file_"+i);
+
+fileInput.addEventListener("change", function(event){
+  saveImage(event, "p"+i);
+});
+
 }
-document.getElementById("step3").classList.remove("hidden");
+
 next(3);
 }
 
@@ -266,9 +271,6 @@ for(let i=1;i<=mp;i++){
 
 doc.text("Mischprobe "+i,10,y); y+=5;
 doc.text("ID: "+document.getElementById("id_"+i).value,10,y); y+=5;
-doc.text("Material: "+document.getElementById("mat_"+i).value,10,y); y+=5;
-doc.text("Konsistenz: "+document.getElementById("kons_"+i).value,10,y); y+=5;
-doc.text("Geruch: "+document.getElementById("geruch_"+i).value,10,y); y+=5;
 
 if(images["p"+i]){
 doc.addImage(images["p"+i],"JPEG",10,y,60,40);
@@ -282,6 +284,5 @@ doc.save("PN98_Protokoll.pdf");
 }
 
 </script>
-
 </body>
 </html>
