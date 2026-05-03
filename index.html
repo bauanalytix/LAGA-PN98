@@ -171,7 +171,8 @@ if(!container){
 container.innerHTML = "";
 
 console.log("Mischproben:", mp);
-
+alert("läuft");
+  
 for(let i=1; i<=mp; i++){
 
 let block = document.createElement("div");
@@ -228,7 +229,7 @@ Foto
 
 container.appendChild(block);
 }
-
+document.getElementById("step3").classList.remove("hidden");
 next(3);
 }
 
