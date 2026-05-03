@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PN98-Probenahme</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 20px;
+  background: #f5f5f5;
+}
+.box {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.hidden { display:none; }
+button { padding:10px; margin:5px; }
+textarea { width:100%; height:60px; }
+input, select { width:100%; margin-bottom:10px; }
+img { max-width:100%; margin-top:10px; }
+.logo {
+  position:absolute;
+  top:10px;
+  right:20px;
+  height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<img src="bauanalytix_rz_farbe einzeln_klein.jpg" class="logo" onerror="this.style.display='none'">
+
+<h1>PN98-Probenahmeprotokoll</h1>
+
+<!-- STEP 1 -->
+<div class="box" id="step1">
+<h2>1. Allgemeine Daten</h2>
+
+Projektnummer<input id="projNr">
+Projektname<input id="projName">
+Auftraggeber<input id="auftraggeber">
+Probenahmeort<input id="ort">
+
+Projektverantwortliche
+<select id="verantwortlich">
+<option>Daniela Oehmichen</option>
+<option>Werner Schalk</option>
+</select>
+
+Anlass
+<select id="anlass">
+<option>Deklaration zur Entsorgung</option>
+<option>Beweissicherung</option>
+</select>
+
+Flächennutzung
+<select id="nutzung">
+<option>Baustelle</option>
+</select>
+
+Oberflächenversiegelung
+<select id="versiegelung">
+<option>Beton</option>
+<option>Pflaster</option>
+<option>keine</option>
+</select>
+
+Bemerkungen<textarea id="bem"></textarea>
+
+<button onclick="next(2)">Weiter</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="box hidden" id="step2">
+<h2>2. Haufwerk</h2>
+
+Material<input id="material">
+AVV<input id="avv">
+Volumen (m³)<input id="vol">
+
+Lagerart
+<select id="lagerart">
+<option>Halde</option>
+<option>Container</option>
+</select>
+
+Lagerform
+<select id="lagerform">
+<option>kegelförmig</option>
+<option>trapezförmig</option>
+</select>
+
+Größtkorn<input id="korn">
+
+Volumenmethode
+<select id="volmeth">
+<option>Schrittmass</option>
+<option>Schätzung</option>
+<option>Messung</option>
+</select>
+
+Vermutete Schadstoffe<input id="schad">
+
+Einzelproben (EP)<input id="ep" type="number">
+Mischproben (MP)<input id="mp" type="number">
+Laborproben (LP)<input id="lp" type="number">
+
+Foto Übersicht
+<input type="file" accept="image/*" onchange="saveImage(event,'overview')">
+<img id="img_overview">
+
+<!-- 🔧 HIER ÄNDERUNG -->
+<button type="button" onclick="generateProben()">Proben erzeugen</button>
+
+<button onclick="back(1)">Zurück</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="box hidden" id="step3">
+<h2>3. Mischproben</h2>
+<div id="probenContainer"></div>
+
+<button onclick="back(2)">Zurück</button>
+<button onclick="finish()">PDF erstellen</button>
+</div>
+
+<script>
+
+let images = {};
+
+function next(step){
+  document.querySelectorAll('.box').forEach(b=>b.classList.add('hidden'));
+  document.getElementById('step'+step).classList.remove('hidden');
+}
+
+function back(step){
+  next(step);
+}
+
+/* 🔧 KOMPLETT ERSETZT */
+function generateProben(){
+
+let mpField = document.getElementById("mp");
+
+if(!mpField){
+  alert("MP-Feld nicht gefunden");
+  return;
+}
+
+let mp = parseInt(mpField.value);
+
+if(isNaN(mp) || mp <= 0){
+  alert("Bitte gültige Anzahl Mischproben eingeben");
+  return;
+}
+
+let container = document.getElementById("probenContainer");
+
+if(!container){
+  alert("Container nicht gefunden");
+  return;
+}
+
+container.innerHTML = "";
+
+console.log("Mischproben:", mp);
+
+for(let i=1; i<=mp; i++){
+
+let block = document.createElement("div");
+block.className = "box";
+
+block.innerHTML = `
+<h3>Mischprobe ${i}</h3>
+
+Proben-ID<input id="id_${i}">
+
+Materialbeschreibung<textarea id="mat_${i}"></textarea>
+
+Konsistenz
+<select id="kons_${i}">
+<option>fest</option>
+<option>schlammig</option>
+<option>flüssig</option>
+</select>
+
+Geruch
+<select id="geruch_${i}">
+<option>unauffällig</option>
+<option>aromatisch</option>
+<option>muffig</option>
+<option>ölig</option>
+<option>chemisch</option>
+</select>
+
+Fremdstoffe mineralisch<input id="fm_${i}">
+Fremdstoffe nicht-mineralisch<input id="fn_${i}">
+
+Volumen (l)<input id="volp_${i}">
+
+Position
+<select id="pos_${i}">
+<option>mittig</option>
+<option>links</option>
+<option>rechts</option>
+</select>
+
+Probenahmeart
+<select id="art_${i}">
+<option>händisch</option>
+<option>Schaufel</option>
+<option>Bagger</option>
+</select>
+
+Besonderheiten<textarea id="bes_${i}"></textarea>
+
+Foto
+<input type="file" accept="image/*" onchange="saveImage(event,'p${i}')">
+<img id="img_p${i}">
+`;
+
+container.appendChild(block);
+}
+
+next(3);
+}
+
+function saveImage(event,key){
+let file = event.target.files[0];
+if(!file) return;
+
+let reader = new FileReader();
+reader.onload = function(e){
+  images[key] = e.target.result;
+  document.getElementById("img_"+key).src = e.target.result;
+}
+reader.readAsDataURL(file);
+}
+
+function finish(){
+
+const {jsPDF}=window.jspdf;
+let doc=new jsPDF();
+
+let y=10;
+
+doc.setFontSize(14);
+doc.text("PN98-Probenahmeprotokoll",10,y);
+y+=8;
+
+doc.setFontSize(9);
+
+doc.text("Projekt: "+document.getElementById("projName").value,10,y); y+=5;
+doc.text("Ort: "+document.getElementById("ort").value,10,y); y+=5;
+doc.text("Material: "+document.getElementById("material").value,10,y); y+=5;
+doc.text("Volumen: "+document.getElementById("vol").value+" m³",10,y); y+=8;
+
+let mp = parseInt(document.getElementById("mp").value);
+
+for(let i=1;i<=mp;i++){
+
+doc.text("Mischprobe "+i,10,y); y+=5;
+doc.text("ID: "+document.getElementById("id_"+i).value,10,y); y+=5;
+doc.text("Material: "+document.getElementById("mat_"+i).value,10,y); y+=5;
+doc.text("Konsistenz: "+document.getElementById("kons_"+i).value,10,y); y+=5;
+doc.text("Geruch: "+document.getElementById("geruch_"+i).value,10,y); y+=5;
+
+if(images["p"+i]){
+doc.addImage(images["p"+i],"JPEG",10,y,60,40);
+y+=45;
+}
+
+y+=5;
+}
+
+doc.save("PN98_Protokoll.pdf");
+}
+
+</script>
+
+</body>
+</html>
