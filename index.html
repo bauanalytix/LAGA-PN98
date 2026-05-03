@@ -128,8 +128,6 @@ Laborproben (LP)<input id="lp" type="number">
 
 <script>
 
-let images = {};
-
 function next(step){
   document.querySelectorAll('.box').forEach(b=>b.classList.add('hidden'));
   document.getElementById('step'+step).classList.remove('hidden');
@@ -141,146 +139,29 @@ function back(step){
 
 function generateProben(){
 
-alert("läuft");
+alert("läuft");  // TEST
 
-let mpField = document.getElementById("mp");
-
-if(!mpField){
-  alert("MP-Feld nicht gefunden");
-  return;
-}
-
-let mp = parseInt(mpField.value);
+let mp = parseInt(document.getElementById("mp").value);
 
 if(isNaN(mp) || mp <= 0){
-  alert("Bitte gültige Anzahl Mischproben eingeben");
+  alert("Bitte Mischproben eingeben");
   return;
 }
 
 let container = document.getElementById("probenContainer");
-
-if(!container){
-  alert("Container nicht gefunden");
-  return;
-}
-
 container.innerHTML = "";
 
+/* 🔴 EXTREM EINFACHER TEST – KEIN TEMPLATE STRING */
 for(let i=1; i<=mp; i++){
 
-let block = document.createElement("div");
-block.className = "box";
+let div = document.createElement("div");
+div.innerText = "Mischprobe " + i;
 
-/* 🔴 WICHTIG: KEIN onchange, KEIN komplexer String */
-block.innerHTML = `
-<h3>Mischprobe ${i}</h3>
-
-Proben-ID<input id="id_${i}">
-
-Materialbeschreibung<textarea id="mat_${i}"></textarea>
-
-Konsistenz
-<select id="kons_${i}">
-<option>fest</option>
-<option>schlammig</option>
-<option>flüssig</option>
-</select>
-
-Geruch
-<select id="geruch_${i}">
-<option>unauffällig</option>
-<option>aromatisch</option>
-<option>muffig</option>
-<option>ölig</option>
-<option>chemisch</option>
-</select>
-
-Fremdstoffe mineralisch<input id="fm_${i}">
-Fremdstoffe nicht-mineralisch<input id="fn_${i}">
-
-Volumen (l)<input id="volp_${i}">
-
-Position
-<select id="pos_${i}">
-<option>mittig</option>
-<option>links</option>
-<option>rechts</option>
-</select>
-
-Probenahmeart
-<select id="art_${i}">
-<option>händisch</option>
-<option>Schaufel</option>
-<option>Bagger</option>
-</select>
-
-Besonderheiten<textarea id="bes_${i}"></textarea>
-
-Foto
-<input type="file" accept="image/*" id="file_${i}">
-<img id="img_p${i}">
-`;
-
-container.appendChild(block);
-
-/* 🔧 EVENT sauber nachträglich setzen */
-let fileInput = document.getElementById("file_"+i);
-
-fileInput.addEventListener("change", function(event){
-  saveImage(event, "p"+i);
-});
+container.appendChild(div);
 
 }
 
 next(3);
-}
-
-function saveImage(event,key){
-let file = event.target.files[0];
-if(!file) return;
-
-let reader = new FileReader();
-reader.onload = function(e){
-  images[key] = e.target.result;
-  document.getElementById("img_"+key).src = e.target.result;
-}
-reader.readAsDataURL(file);
-}
-
-function finish(){
-
-const {jsPDF}=window.jspdf;
-let doc=new jsPDF();
-
-let y=10;
-
-doc.setFontSize(14);
-doc.text("PN98-Probenahmeprotokoll",10,y);
-y+=8;
-
-doc.setFontSize(9);
-
-doc.text("Projekt: "+document.getElementById("projName").value,10,y); y+=5;
-doc.text("Ort: "+document.getElementById("ort").value,10,y); y+=5;
-doc.text("Material: "+document.getElementById("material").value,10,y); y+=5;
-doc.text("Volumen: "+document.getElementById("vol").value+" m³",10,y); y+=8;
-
-let mp = parseInt(document.getElementById("mp").value);
-
-for(let i=1;i<=mp;i++){
-
-doc.text("Mischprobe "+i,10,y); y+=5;
-doc.text("ID: "+document.getElementById("id_"+i).value,10,y); y+=5;
-
-if(images["p"+i]){
-doc.addImage(images["p"+i],"JPEG",10,y,60,40);
-y+=45;
-}
-
-y+=5;
-}
-
-doc.save("PN98_Protokoll.pdf");
 }
 
 </script>
