@@ -202,7 +202,8 @@ fileInput.addEventListener("change", function(event){
 });
 
 container.appendChild(block);
-
+block.style.border = "5px solid red";
+block.innerHTML += "<div style='color:red;'>TEST TEXT</div>";
 }
 
 next(3);
