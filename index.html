@@ -207,7 +207,19 @@ container.appendChild(block);
 
 next(3);
 }
+function saveImage(event, key){
+  let file = event.target.files[0];
+  if(!file) return;
 
+  let reader = new FileReader();
+  reader.onload = function(e){
+    let img = document.getElementById("img_"+key);
+    if(img){
+      img.src = e.target.result;
+    }
+  }
+  reader.readAsDataURL(file);
+}
 </script>
 </body>
 </html>
