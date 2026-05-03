@@ -151,11 +151,56 @@ if(isNaN(mp) || mp <= 0){
 let container = document.getElementById("probenContainer");
 container.innerHTML = "";
 
-/* 🔴 EXTREM EINFACHER TEST – KEIN TEMPLATE STRING */
+
 for(let i=1; i<=mp; i++){
 
-let div = document.createElement("div");
-div.innerText = "Mischprobe " + i;
+let block = document.createElement("div");
+block.className = "box";
+
+// Titel
+let title = document.createElement("h3");
+title.innerText = "Mischprobe " + i;
+block.appendChild(title);
+
+// Proben-ID
+let label1 = document.createElement("div");
+label1.innerText = "Proben-ID";
+block.appendChild(label1);
+
+let input1 = document.createElement("input");
+input1.id = "id_"+i;
+block.appendChild(input1);
+
+// Materialbeschreibung
+let label2 = document.createElement("div");
+label2.innerText = "Materialbeschreibung";
+block.appendChild(label2);
+
+let textarea = document.createElement("textarea");
+textarea.id = "mat_"+i;
+block.appendChild(textarea);
+
+// Foto
+let label3 = document.createElement("div");
+label3.innerText = "Foto";
+block.appendChild(label3);
+
+let fileInput = document.createElement("input");
+fileInput.type = "file";
+fileInput.accept = "image/*";
+fileInput.id = "file_"+i;
+block.appendChild(fileInput);
+
+let img = document.createElement("img");
+img.id = "img_p"+i;
+block.appendChild(img);
+
+// Event sauber setzen
+fileInput.addEventListener("change", function(event){
+  saveImage(event, "p"+i);
+});
+
+container.appendChild(block);
 
 container.appendChild(div);
 
