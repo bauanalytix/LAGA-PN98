@@ -140,7 +140,7 @@ function back(step){
 
 function generateProben(){
 
-alert("läuft");  // TEST
+alert("läuft");
 
 let mp = parseInt(document.getElementById("mp").value);
 
@@ -152,60 +152,24 @@ if(isNaN(mp) || mp <= 0){
 let container = document.getElementById("probenContainer");
 container.innerHTML = "";
 
-
+/* 🔴 GANZ EINFACHER, STABILER AUFBAU */
 for(let i=1; i<=mp; i++){
 
-let block = document.createElement("div");
-block.className = "box";
+let html = "<div class='box'>";
+html += "<h3>Mischprobe " + i + "</h3>";
+html += "Proben-ID<br><input>";
+html += "Materialbeschreibung<br><textarea></textarea>";
+html += "</div>";
 
-// Titel
-let title = document.createElement("h3");
-title.innerText = "Mischprobe " + i;
-block.appendChild(title);
+container.innerHTML += html;
 
-// Proben-ID
-let label1 = document.createElement("div");
-label1.innerText = "Proben-ID";
-block.appendChild(label1);
-
-let input1 = document.createElement("input");
-input1.id = "id_"+i;
-block.appendChild(input1);
-
-// Materialbeschreibung
-let label2 = document.createElement("div");
-label2.innerText = "Materialbeschreibung";
-block.appendChild(label2);
-
-let textarea = document.createElement("textarea");
-textarea.id = "mat_"+i;
-block.appendChild(textarea);
-
-// Foto
-let label3 = document.createElement("div");
-label3.innerText = "Foto";
-block.appendChild(label3);
-
-let fileInput = document.createElement("input");
-fileInput.type = "file";
-fileInput.accept = "image/*";
-fileInput.id = "file_"+i;
-block.appendChild(fileInput);
-
-let img = document.createElement("img");
-img.id = "img_p"+i;
-block.appendChild(img);
-
-// Event sauber setzen
-fileInput.addEventListener("change", function(event){
-  saveImage(event, "p"+i);
-});
-
-container.appendChild(block);
-block.style.border = "5px solid red";
-block.innerHTML += "<div style='color:red;'>TEST TEXT</div>";
 }
 
+/* Schritt sichtbar machen */
+document.getElementById("step2").classList.add("hidden");
+document.getElementById("step3").classList.remove("hidden");
+
+}
 next(3);
 }
 function saveImage(event, key){
