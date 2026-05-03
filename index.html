@@ -112,11 +112,6 @@ Einzelproben (EP)<input id="ep" type="number">
 Mischproben (MP)<input id="mp" type="number">
 Laborproben (LP)<input id="lp" type="number">
 
-Foto Übersicht
-<input type="file" accept="image/*" onchange="saveImage(event,'overview')">
-<img id="img_overview">
-
-<!-- 🔧 HIER ÄNDERUNG -->
 <button type="button" onclick="generateProben()">Proben erzeugen</button>
 
 <button onclick="back(1)">Zurück</button>
@@ -144,7 +139,7 @@ function back(step){
   next(step);
 }
 
-/* 🔧 KOMPLETT ERSETZT */
+
 function generateProben(){
 
 let mpField = document.getElementById("mp");
