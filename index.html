@@ -113,7 +113,14 @@ Reduktionsoption genutzt?
 Laborproben reduziert auf<input id="lpr">
 
   Foto Haufwerk
-<input type="file" id="fotoHaufwerk" accept="image/*">
+Foto Haufwerk 1
+<input type="file" id="fotoH1" accept="image/*" onchange="saveImage(event,'h1')">
+<img id="img_h1">
+
+Foto Haufwerk 2
+<input type="file" id="fotoH2" accept="image/*" onchange="saveImage(event,'h2')">
+<img id="img_h2">
+  
   
 <button onclick="generateProben()">Mischproben erzeugen</button>
 </div>
@@ -192,7 +199,13 @@ Probenahmeart
 
 Besonderheiten<textarea class="bes"></textarea>
 
-Foto<input type="file" class="foto">
+Foto 1
+<input type="file" class="foto1" onchange="saveImage(event, 'p${i}_1')">
+<img id="img_p${i}_1">
+
+Foto 2
+<input type="file" class="foto2" onchange="saveImage(event, 'p${i}_2')">
+<img id="img_p${i}_2">
 `;
 
 container.appendChild(div);
@@ -248,7 +261,17 @@ doc.text("Volumen: "+vol.value,10,y); y+=5;
 doc.text("EP: "+ep.value+" MP: "+mp.value+" LP: "+lp.value,10,y); y+=5;
 doc.text("Reduktion: "+red.value+" -> "+lpr.value,10,y); y+=8;
 
-  let fileInput = document.getElementById("fotoHaufwerk");
+if(images["h1"]){
+  doc.text("Foto Haufwerk 1:",10,y); y+=5;
+  doc.addImage(images["h1"], "JPEG", 10, y, 80, 60);
+  y+=65;
+}
+
+if(images["h2"]){
+  doc.text("Foto Haufwerk 2:",10,y); y+=5;
+  doc.addImage(images["h2"], "JPEG", 10, y, 80, 60);
+  y+=65;
+}
 
 if(fileInput.files.length > 0){
 
@@ -291,6 +314,17 @@ doc.text("Position: "+b.querySelector(".pos").value,10,y); y+=5;
 doc.text("Art: "+b.querySelector(".art").value,10,y); y+=5;
 doc.text("Besonderheiten: "+b.querySelector(".bes").value,10,y); y+=8;
 
+  if(images["p"+(i+1)+"_1"]){
+  doc.text("Foto 1:",10,y); y+=5;
+  doc.addImage(images["p"+(i+1)+"_1"], "JPEG", 10, y, 80, 60);
+  y+=65;
+}
+
+if(images["p"+(i+1)+"_2"]){
+  doc.text("Foto 2:",10,y); y+=5;
+  doc.addImage(images["p"+(i+1)+"_2"], "JPEG", 10, y, 80, 60);
+  y+=65;
+}
 if(y>270){ doc.addPage(); y=10; }
 
 });
@@ -307,6 +341,24 @@ function setDatumZeit(){
 }
 
 window.onload = setDatumZeit;
+
+  let images = {};
+
+function saveImage(event, key){
+  let file = event.target.files[0];
+  if(!file) return;
+
+  let reader = new FileReader();
+  reader.onload = function(e){
+    images[key] = e.target.result;
+
+    let img = document.getElementById("img_"+key);
+    if(img){
+      img.src = e.target.result;
+    }
+  }
+  reader.readAsDataURL(file);
+}
 </script>
 
 </body>
