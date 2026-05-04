@@ -237,82 +237,105 @@ ctx.drawImage(img,0,0);
 doc.addImage(canvas.toDataURL(),"PNG",150,5,40,15);
 }catch(e){}
 
+/* Hilfsfunktion Tabelle */
+function row(label, value){
+  doc.setFont("helvetica","bold");
+  doc.text(label,10,y);
+  doc.setFont("helvetica","normal");
+  doc.text(String(value||""),80,y);
+  y+=6;
+  if(y>280){ doc.addPage(); y=10; }
+}
+
 /* Titel */
 doc.setFontSize(14);
-doc.text("PN98-Probenahmeprotokoll",10,y); y+=10;
+doc.text("PN98-Probenahmeprotokoll",10,y);
+y+=10;
 
 /* Abschnitt 1 */
-doc.setFontSize(11);
-doc.text("1. Allgemeine Daten",10,y); y+=6;
+doc.setFontSize(12);
+doc.text("1. Allgemeine Daten",10,y);
+y+=6;
 
 doc.setFontSize(9);
-doc.text("Projektnummer: "+projNr.value,10,y); y+=5;
-doc.text("Projekt: "+projName.value,10,y); y+=5;
-doc.text("Auftraggeber: "+auftraggeber.value,10,y); y+=5;
-doc.text("Ort: "+ort.value,10,y); y+=5;
-doc.text("Datum: "+datum.value,10,y); y+=5;
-doc.text("Verantwortlich: "+verantwortlich.value,10,y); y+=5;
-doc.text("Anlass: "+anlass.value,10,y); y+=5;
-doc.text("Nutzung: "+nutzung.value,10,y); y+=5;
-doc.text("Versiegelung: "+versiegelung.value,10,y); y+=5;
-doc.text("Bemerkungen: "+bem.value,10,y); y+=8;
+
+row("Projektnummer:", projNr.value);
+row("Projekt:", projName.value);
+row("Auftraggeber:", auftraggeber.value);
+row("Ort:", ort.value);
+row("Datum:", datum.value);
+row("Verantwortlich:", verantwortlich.value);
+row("Anlass:", anlass.value);
+row("Nutzung:", nutzung.value);
+row("Versiegelung:", versiegelung.value);
+row("Bemerkungen:", bem.value);
+
+y+=4;
 
 /* Abschnitt 2 */
-doc.setFontSize(11);
-doc.text("2. Haufwerk",10,y); y+=6;
+doc.setFontSize(12);
+doc.text("2. Haufwerk",10,y);
+y+=6;
 
 doc.setFontSize(9);
-doc.text("Material: "+material.value,10,y); y+=5;
-doc.text("AVV: "+avv.value,10,y); y+=5;
-doc.text("Volumen: "+vol.value,10,y); y+=5;
-doc.text("EP: "+ep.value+" MP: "+mp.value+" LP: "+lp.value,10,y); y+=5;
-doc.text("Reduktion: "+red.value+" -> "+lpr.value,10,y); y+=8;
 
-if(images["h1"]){
-  doc.text("Foto Haufwerk 1:",10,y); y+=5;
-  doc.addImage(images["h1"], "PNG", 10, y, 80, 60);
-  y+=65;
+row("Material:", material.value);
+row("AVV:", avv.value);
+row("Volumen:", vol.value);
+row("Einzelproben:", ep.value);
+row("Mischproben:", mp.value);
+row("Laborproben:", lp.value);
+row("Reduktion genutzt:", red.value);
+row("Laborproben reduziert auf:", lpr.value);
+
+/* Fotos Haufwerk */
+function addImageIfExists(key, label){
+  if(images[key]){
+    doc.text(label,10,y);
+    y+=5;
+    doc.addImage(images[key], "PNG", 10, y, 80, 60);
+    y+=65;
+    if(y>280){ doc.addPage(); y=10; }
+  }
 }
 
-if(images["h2"]){
-  doc.text("Foto Haufwerk 2:",10,y); y+=5;
-  doc.addImage(images["h2"], "PNG", 10, y, 80, 60);
-  y+=65;
-}
+addImageIfExists("h1","Foto Haufwerk 1:");
+addImageIfExists("h2","Foto Haufwerk 2:");
+
+y+=4;
 
 /* Abschnitt 3 */
-doc.setFontSize(11);
-doc.text("3. Mischproben",10,y); y+=6;
+doc.setFontSize(12);
+doc.text("3. Mischproben",10,y);
+y+=6;
 
 let blocks=document.querySelectorAll("#probenContainer .box");
 
 blocks.forEach((b,i)=>{
 
 doc.setFontSize(10);
-doc.text("Probe "+(i+1),10,y); y+=5;
+doc.text("Mischprobe "+(i+1),10,y);
+y+=6;
 
 doc.setFontSize(9);
-doc.text("ID: "+b.querySelector(".pid").value,10,y); y+=5;
-doc.text("Material: "+b.querySelector(".mat").value,10,y); y+=5;
-doc.text("Konsistenz: "+b.querySelector(".kons").value,10,y); y+=5;
-doc.text("Geruch: "+b.querySelector(".ger").value,10,y); y+=5;
-doc.text("Volumen: "+b.querySelector(".volp").value,10,y); y+=5;
-doc.text("Position: "+b.querySelector(".pos").value,10,y); y+=5;
-doc.text("Art: "+b.querySelector(".art").value,10,y); y+=5;
-doc.text("Besonderheiten: "+b.querySelector(".bes").value,10,y); y+=8;
 
-  if(images["p"+(i+1)+"_1"]){
-  doc.text("Foto 1:",10,y); y+=5;
-  doc.addImage(images["p"+(i+1)+"_1"], "PNG", 10, y, 80, 60);
-  y+=65;
-}
+row("Sektor-Nr.:", b.querySelector(".sektor").value);
+row("Proben-ID:", b.querySelector(".pid").value);
+row("Materialbeschreibung:", b.querySelector(".mat").value);
+row("Konsistenz:", b.querySelector(".kons").value);
+row("Geruch:", b.querySelector(".ger").value);
+row("Fremdstoffe mineralisch:", b.querySelector(".fm").value);
+row("Fremdstoffe nicht-mineralisch:", b.querySelector(".fn").value);
+row("Volumen (L):", b.querySelector(".volp").value);
+row("Position:", b.querySelector(".pos").value);
+row("Probenahmeart:", b.querySelector(".art").value);
+row("Besonderheiten:", b.querySelector(".bes").value);
 
-if(images["p"+(i+1)+"_2"]){
-  doc.text("Foto 2:",10,y); y+=5;
-  doc.addImage(images["p"+(i+1)+"_2"], "PNG", 10, y, 80, 60);
-  y+=65;
-}
-if(y>270){ doc.addPage(); y=10; }
+/* Fotos je Probe */
+addImageIfExists("p"+(i+1)+"_1","Foto 1:");
+addImageIfExists("p"+(i+1)+"_2","Foto 2:");
+
+y+=4;
 
 });
 
