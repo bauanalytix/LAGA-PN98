@@ -41,15 +41,7 @@ Projektname<input id="projName">
 Auftraggeber<input id="auftraggeber">
 Probenahmeort<input id="ort">
 Datum der Probenahme<input id="datum">
-function setDatumZeit(){
-  let now = new Date();
 
-  let datum = now.toLocaleDateString("de-DE");
-  let zeit = now.toLocaleTimeString("de-DE", {hour: '2-digit', minute: '2-digit'});
-
-  document.getElementById("datum").value = datum + " " + zeit;
-}
-setDatumZeit();  
 Projektverantwortliche
 <select id="verantwortlich">
 <option>Daniela Oehmichen</option>
@@ -305,7 +297,16 @@ if(y>270){ doc.addPage(); y=10; }
 
 doc.save("PN98_Protokoll.pdf");
 }
+function setDatumZeit(){
+  let now = new Date();
 
+  let datum = now.toLocaleDateString("de-DE");
+  let zeit = now.toLocaleTimeString("de-DE", {hour: '2-digit', minute: '2-digit'});
+
+  document.getElementById("datum").value = datum + " " + zeit;
+}
+
+window.onload = setDatumZeit;
 </script>
 
 </body>
