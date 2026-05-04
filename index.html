@@ -270,13 +270,13 @@ doc.text("Reduktion: "+red.value+" -> "+lpr.value,10,y); y+=8;
 
 if(images["h1"]){
   doc.text("Foto Haufwerk 1:",10,y); y+=5;
-  doc.addImage(images["h1"], "JPEG", 10, y, 80, 60);
+  doc.addImage(images["h1"], "PNG", 10, y, 80, 60);
   y+=65;
 }
 
 if(images["h2"]){
   doc.text("Foto Haufwerk 2:",10,y); y+=5;
-  doc.addImage(images["h2"], "JPEG", 10, y, 80, 60);
+  doc.addImage(images["h2"], "PNG", 10, y, 80, 60);
   y+=65;
 }
 
@@ -303,13 +303,13 @@ doc.text("Besonderheiten: "+b.querySelector(".bes").value,10,y); y+=8;
 
   if(images["p"+(i+1)+"_1"]){
   doc.text("Foto 1:",10,y); y+=5;
-  doc.addImage(images["p"+(i+1)+"_1"], "JPEG", 10, y, 80, 60);
+  doc.addImage(images["p"+(i+1)+"_1"], "PNG", 10, y, 80, 60);
   y+=65;
 }
 
 if(images["p"+(i+1)+"_2"]){
   doc.text("Foto 2:",10,y); y+=5;
-  doc.addImage(images["p"+(i+1)+"_2"], "JPEG", 10, y, 80, 60);
+  doc.addImage(images["p"+(i+1)+"_2"], "PNG", 10, y, 80, 60);
   y+=65;
 }
 if(y>270){ doc.addPage(); y=10; }
