@@ -50,8 +50,8 @@ Datum der Probenahme<input id="datum">
 
 Projektverantwortliche
 <select id="verantwortlich">
-<option>Daniela Oehmichen</option>
-<option>Werner Schalk</option>
+<option>Daniela Oehmichen, bauanalytix</option>
+<option>Werner Schalk, bauanalytix</option>
 </select>
 
 Anlass der Probennahme
@@ -225,8 +225,10 @@ const {jsPDF}=window.jspdf;
 let doc=new jsPDF();
 
 let y=10;
+  addLogo();
 
-/* Logo */
+  function addLogo(){
+
 let img = document.getElementById("logoImg");
 
 if(img.complete){
@@ -240,9 +242,17 @@ ctx.drawImage(img,0,0);
 
 let imgData = canvas.toDataURL("image/png");
 
-doc.addImage(imgData, "PNG", 150, 5, 40, 15);
+let pdfWidth = 40;
+let ratio = img.naturalHeight / img.naturalWidth;
+let pdfHeight = pdfWidth * ratio;
+
+doc.addImage(imgData, "PNG", 150, 5, pdfWidth, pdfHeight);
 
 }
+}
+  
+/* Logo */
+
 
 /* Hilfsfunktion Tabelle */
 function row(label, value){
@@ -315,7 +325,7 @@ y+=4;
 doc.setFontSize(12);
 doc.addPage();
 y = 10;
-
+addLogo();
 doc.text("3. Mischproben",10,y);
 y += 6;
 y+=6;
