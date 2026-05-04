@@ -14,6 +14,15 @@ input, select, textarea { width: 100%; margin-bottom: 10px; }
 textarea { height:60px; }
 button { padding:10px; margin-top:10px; }
 .logo { position:absolute; top:10px; right:20px; height:60px; }
+
+  @media (max-width: 600px) {
+  .logo {
+    height: 35px;
+    right: 10px;
+    top: 5px;
+  }
+}
+  
 </style>
 </head>
 
@@ -32,7 +41,15 @@ Projektname<input id="projName">
 Auftraggeber<input id="auftraggeber">
 Probenahmeort<input id="ort">
 Datum der Probenahme<input id="datum">
+function setDatumZeit(){
+  let now = new Date();
 
+  let datum = now.toLocaleDateString("de-DE");
+  let zeit = now.toLocaleTimeString("de-DE", {hour: '2-digit', minute: '2-digit'});
+
+  document.getElementById("datum").value = datum + " " + zeit;
+}
+setDatumZeit();  
 Projektverantwortliche
 <select id="verantwortlich">
 <option>Daniela Oehmichen</option>
