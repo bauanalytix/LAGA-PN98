@@ -140,7 +140,8 @@ Foto Haufwerk 2
 <button onclick="createPDF()">PDF erstellen</button>
 
 <script>
-
+  let images = {};
+  
 function generateProben(){
 
 let mp = parseInt(document.getElementById("mp").value);
@@ -279,26 +280,6 @@ if(images["h2"]){
   y+=65;
 }
 
-if(fileInput.files.length > 0){
-
-let file = fileInput.files[0];
-let reader = new FileReader();
-
-reader.onload = function(e){
-
-doc.text("Foto Haufwerk:",10,y); 
-y+=5;
-
-doc.addImage(e.target.result, "JPEG", 10, y, 80, 60);
-y+=65;
-
-doc.save("PN98_Protokoll.pdf");
-};
-
-reader.readAsDataURL(file);
-
-return; // verhindert doppeltes Speichern
-}
 /* Abschnitt 3 */
 doc.setFontSize(11);
 doc.text("3. Mischproben",10,y); y+=6;
@@ -347,8 +328,6 @@ function setDatumZeit(){
 }
 
 window.onload = setDatumZeit;
-
-  let images = {};
 
 function saveImage(event, key){
   let file = event.target.files[0];
