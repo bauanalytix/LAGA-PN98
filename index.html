@@ -227,15 +227,22 @@ let doc=new jsPDF();
 let y=10;
 
 /* Logo */
-try{
-let img=document.getElementById("logoImg");
-let canvas=document.createElement("canvas");
-canvas.width=img.width;
-canvas.height=img.height;
-let ctx=canvas.getContext("2d");
+let img = document.getElementById("logoImg");
+
+if(img.complete){
+
+let canvas = document.createElement("canvas");
+canvas.width = img.naturalWidth;
+canvas.height = img.naturalHeight;
+
+let ctx = canvas.getContext("2d");
 ctx.drawImage(img,0,0);
-doc.addImage(canvas.toDataURL(),"PNG",150,5,40,15);
-}catch(e){}
+
+let imgData = canvas.toDataURL("image/png");
+
+doc.addImage(imgData, "PNG", 150, 5, 40, 15);
+
+}
 
 /* Hilfsfunktion Tabelle */
 function row(label, value){
@@ -306,7 +313,11 @@ y+=4;
 
 /* Abschnitt 3 */
 doc.setFontSize(12);
+doc.addPage();
+y = 10;
+
 doc.text("3. Mischproben",10,y);
+y += 6;
 y+=6;
 
 let blocks=document.querySelectorAll("#probenContainer .box");
