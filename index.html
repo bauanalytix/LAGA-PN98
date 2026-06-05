@@ -369,21 +369,6 @@ blocks.forEach((b,i)=>{
 
   y += 6;
 
-let blocks=document.querySelectorAll("#probenContainer .box");
-
-blocks.forEach((b,i)=>{
-
- doc.addPage();
-  y = 20;
-  addLogo();
-
-doc.setFontSize(10);
-doc.setFont("helvetica","bold");
-doc.text("Mischprobe "+(i+1), marginLeft, y);
-doc.setFont("helvetica","normal");
-  
-y+=6;
-
 doc.setFontSize(9);
 
 row("Sektor-Nr.:", b.querySelector(".sektor").value);
