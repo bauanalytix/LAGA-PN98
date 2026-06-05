@@ -240,13 +240,13 @@ canvas.height = img.naturalHeight;
 let ctx = canvas.getContext("2d");
 ctx.drawImage(img,0,0);
 
-let imgData = canvas.toDataURL("image/png");
+let imgData = canvas.toDataURL("image/jpeg", 0.6);
 
-let pdfWidth = 40;
+let pdfWidth = 30;
 let ratio = img.naturalHeight / img.naturalWidth;
 let pdfHeight = pdfWidth * ratio;
 
-doc.addImage(imgData, "PNG", 150, 5, pdfWidth, pdfHeight);
+doc.addImage(imgData, "JPEG", 150, 5, pdfWidth, pdfHeight);
 
 }
 }
