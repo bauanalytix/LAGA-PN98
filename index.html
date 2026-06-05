@@ -226,7 +226,8 @@ container.appendChild(div);
 }
 
 function createPDF(){
-
+addLogo();
+addHeader();
 const {jsPDF}=window.jspdf;
 let doc=new jsPDF();
 
@@ -239,6 +240,20 @@ let contentWidth = 170 - marginRight;  // nutzbare Breite
 
   function addLogo(){
 
+    function addHeader(){
+
+doc.setFontSize(9);
+doc.setFont("helvetica","normal");
+
+doc.text("Projekt: " + projName.value, 20, 10);
+doc.text("Projektnummer: " + projNr.value, 20, 15);
+doc.text("Auftraggeber: " + auftraggeber.value, 20, 20);
+doc.text("Datum: " + datum.value, 140, 10);
+
+// Linie unter Kopfbereich
+doc.line(20, 23, 190, 23);
+
+}
 let img = document.getElementById("logoImg");
 
 if(img.complete){
@@ -267,21 +282,25 @@ doc.addImage(imgData, "JPEG", 150, 5, pdfWidth, pdfHeight);
 /* Hilfsfunktion Tabelle */
 function row(label, value){
 
-  doc.setFont("helvetica","bold");
-  doc.text(label, marginLeft, y);
+doc.setFont("helvetica","bold");
+doc.text(label, marginLeft, y);
 
-  doc.setFont("helvetica","normal");
-  doc.text(String(value||""), marginLeft + 70, y);
+doc.setFont("helvetica","normal");
+doc.text(String(value||""), marginLeft + 70, y);
 
-  y += 6;
+// Linie unter der Zeile
+doc.line(marginLeft, y+1, 190, y+1);
 
-  if(y > 280){
-    doc.addPage();
-    y = 20;
-    addLogo();
-  }
+y += 6;
+
+// Seitenumbruch sauber
+if(y > 280){
+  doc.addPage();
+  y = 30;
+  addLogo();
+  addHeader();
 }
-
+}
 /* Titel */
 doc.setFontSize(14);
 doc.text("PN98-Probenahmeprotokoll", marginLeft, y);
@@ -351,8 +370,9 @@ y+=4;
 
 /* Abschnitt 3 */
 doc.addPage();
-y = 20;
+y = 30;
 addLogo();
+addHeader();
 
 doc.setFontSize(12);
 doc.text("3. Mischproben", marginLeft, y);
@@ -363,9 +383,10 @@ let blocks = document.querySelectorAll("#probenContainer .box");
 blocks.forEach((b,i)=>{
 
     if(i > 0){
-    doc.addPage();
-    y = 20;
-    addLogo();
+   doc.addPage();
+y = 30;
+addLogo();
+addHeader();
   }
 doc.setFontSize(9);
 
