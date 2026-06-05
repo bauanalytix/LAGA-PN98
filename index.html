@@ -335,7 +335,12 @@ function addImageIfExists(key, label){
     y+=5;
    doc.addImage(images[key], "PNG", marginLeft, y, 80, 60);
     y+=65;
-    if(y>280){ doc.addPage(); y=10; }
+   if(y>280){
+  doc.addPage();
+  y = 20;
+  addLogo();
+}
+    
   }
 }
 
@@ -347,7 +352,14 @@ y+=4;
 /* Abschnitt 3 */
 doc.setFontSize(12);
 
+doc.addPage();
+y = 20;
+addLogo();
+
+doc.setFontSize(12);
 doc.text("3. Mischproben", marginLeft, y);
+y += 10;
+  
 y += 6;
 y+=6;
 
@@ -359,12 +371,6 @@ blocks.forEach((b,i)=>{
   y = 20;
   addLogo();
 
-  doc.setFontSize(10);
-  doc.setFont("helvetica","bold");
-  doc.text("Mischprobe "+(i+1), marginLeft, y);
-  doc.setFont("helvetica","normal");
-
-  y += 10;
 doc.setFontSize(10);
 doc.setFont("helvetica","bold");
 doc.text("Mischprobe "+(i+1), marginLeft, y);
