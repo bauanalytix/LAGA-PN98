@@ -279,12 +279,12 @@ doc.text(String(value||""), marginLeft + 70, y);
 
 /* Titel */
 doc.setFontSize(14);
-doc.text("PN98-Probenahmeprotokoll",10,y);
+doc.text("PN98-Probenahmeprotokoll", marginLeft, y);
 y+=10;
 
 /* Abschnitt 1 */
 doc.setFontSize(12);
-doc.text("1. Allgemeine Daten",10,y);
+doc.text("1. Allgemeine Daten", marginLeft, y);
 y+=6;
 
 doc.setFontSize(9);
@@ -304,7 +304,7 @@ y+=4;
 
 /* Abschnitt 2 */
 doc.setFontSize(12);
-doc.text("2. Haufwerk",10,y);
+doc.text("2. Haufwerk", marginLeft, y);
 y+=6;
 
 doc.setFontSize(9);
@@ -342,9 +342,9 @@ y+=4;
 /* Abschnitt 3 */
 doc.setFontSize(12);
 doc.addPage();
-y = 10;
+y = 20;
 addLogo();
-doc.text("3. Mischproben",10,y);
+doc.text("3. Mischproben", marginLeft, y);
 y += 6;
 y+=6;
 
