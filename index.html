@@ -242,7 +242,7 @@ ctx.drawImage(img,0,0);
 
 let imgData = canvas.toDataURL("image/png");
 
-let pdfWidth = 60;
+let pdfWidth = 40;
 let ratio = img.naturalHeight / img.naturalWidth;
 let pdfHeight = pdfWidth * ratio;
 
@@ -383,14 +383,41 @@ function saveImage(event, key){
   if(!file) return;
 
   let reader = new FileReader();
-  reader.onload = function(e){
-    images[key] = e.target.result;
 
-    let img = document.getElementById("img_"+key);
-    if(img){
-      img.src = e.target.result;
-    }
-  }
+  reader.onload = function(e){
+
+    let img = new Image();
+
+    img.onload = function(){
+
+      let canvas = document.createElement("canvas");
+
+      // 🔧 Zielgröße (hier anpassen möglich)
+      let maxWidth = 800;
+
+      let scale = maxWidth / img.width;
+
+      canvas.width = maxWidth;
+      canvas.height = img.height * scale;
+
+      let ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // 🔧 Kompression (0.7 = gute Qualität, kleine Datei)
+      let compressed = canvas.toDataURL("image/jpeg", 0.7);
+
+      images[key] = compressed;
+
+      let preview = document.getElementById("img_"+key);
+      if(preview){
+        preview.src = compressed;
+      }
+
+    };
+
+    img.src = e.target.result;
+  };
+
   reader.readAsDataURL(file);
 }
 </script>
