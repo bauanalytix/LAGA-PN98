@@ -351,17 +351,23 @@ y+=4;
 
 /* Abschnitt 3 */
 doc.setFontSize(12);
-
-doc.addPage();
-y = 20;
-addLogo();
-
-doc.setFontSize(12);
 doc.text("3. Mischproben", marginLeft, y);
 y += 10;
-  
-y += 6;
-y+=6;
+
+let blocks = document.querySelectorAll("#probenContainer .box");
+
+blocks.forEach((b,i)=>{
+
+  doc.addPage();
+  y = 20;
+  addLogo();
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica","bold");
+  doc.text("Mischprobe "+(i+1), marginLeft, y);
+  doc.setFont("helvetica","normal");
+
+  y += 6;
 
 let blocks=document.querySelectorAll("#probenContainer .box");
 
