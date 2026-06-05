@@ -230,7 +230,11 @@ function createPDF(){
 const {jsPDF}=window.jspdf;
 let doc=new jsPDF();
 
-let y=10;
+let y = 20;      // größerer oberer Rand
+let marginLeft = 20;
+let marginRight = 20;
+let contentWidth = 170 - marginRight;  // nutzbare Breite
+  
   addLogo();
 
   function addLogo(){
@@ -263,9 +267,12 @@ doc.addImage(imgData, "JPEG", 150, 5, pdfWidth, pdfHeight);
 /* Hilfsfunktion Tabelle */
 function row(label, value){
   doc.setFont("helvetica","bold");
-  doc.text(label,10,y);
+
   doc.setFont("helvetica","normal");
-  doc.text(String(value||""),80,y);
+
+  doc.text(label, marginLeft, y);
+doc.text(String(value||""), marginLeft + 70, y);
+  
   y+=6;
   if(y>280){ doc.addPage(); y=10; }
 }
@@ -344,9 +351,16 @@ y+=6;
 let blocks=document.querySelectorAll("#probenContainer .box");
 
 blocks.forEach((b,i)=>{
-
+if(i > 0){
+  doc.addPage();
+  y = 20;
+  addLogo();
+}
 doc.setFontSize(10);
-doc.text("Mischprobe "+(i+1),10,y);
+doc.setFont("helvetica","bold");
+doc.text("Mischprobe "+(i+1), marginLeft, y);
+doc.setFont("helvetica","normal");
+  
 y+=6;
 
 doc.setFontSize(9);
