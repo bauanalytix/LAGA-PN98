@@ -266,15 +266,20 @@ doc.addImage(imgData, "JPEG", 150, 5, pdfWidth, pdfHeight);
 
 /* Hilfsfunktion Tabelle */
 function row(label, value){
+
   doc.setFont("helvetica","bold");
+  doc.text(label, marginLeft, y);
 
   doc.setFont("helvetica","normal");
+  doc.text(String(value||""), marginLeft + 70, y);
 
-  doc.text(label, marginLeft, y);
-doc.text(String(value||""), marginLeft + 70, y);
-  
-  y+=6;
-  if(y>280){ doc.addPage(); y=10; }
+  y += 6;
+
+  if(y > 280){
+    doc.addPage();
+    y = 20;
+    addLogo();
+  }
 }
 
 /* Titel */
@@ -326,9 +331,9 @@ row("Laborproben reduziert auf:", lpr.value);
 /* Fotos Haufwerk */
 function addImageIfExists(key, label){
   if(images[key]){
-    doc.text(label,10,y);
+    doc.text(label, marginLeft, y);
     y+=5;
-    doc.addImage(images[key], "PNG", 10, y, 80, 60);
+   doc.addImage(images[key], "PNG", marginLeft, y, 80, 60);
     y+=65;
     if(y>280){ doc.addPage(); y=10; }
   }
@@ -341,9 +346,7 @@ y+=4;
 
 /* Abschnitt 3 */
 doc.setFontSize(12);
-doc.addPage();
-y = 20;
-addLogo();
+
 doc.text("3. Mischproben", marginLeft, y);
 y += 6;
 y+=6;
