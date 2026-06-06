@@ -36,46 +36,47 @@ img {
 
 <div class="box">
 <h2>1. Allgemeine Daten</h2>
-Projektnummer<input id="projNr">
-Projektname<input id="projName">
-Auftraggeber<input id="auftraggeber">
-Probenahmeort<input id="ort">
-Datum der Probenahme<input id="datum">
 
+Projektnummer<br><input id="projNr">
+Projektname<br><input id="projName">
+Auftraggeber<br><input id="auftraggeber">
+Probenahmeort<br><input id="ort">
+Datum der Probenahme<br><input id="datum">
+
+Projektverantwortliche<br>
 <select id="verantwortlich">
 <option>Daniela Oehmichen, bauanalytix</option>
 <option>Werner Schalk, bauanalytix</option>
 </select>
 
+Anlass der Probennahme<br>
 <select id="anlass">
 <option>Deklaration zur Entsorgung</option>
 <option>Beweissicherung</option>
 </select>
 
+Aktuelle Flächennutzung<br>
 <select id="nutzung">
 <option>Baustelle</option>
 </select>
 
+Oberflächenversiegelung<br>
 <select id="versiegelung">
 <option>Beton</option>
 <option>Pflaster</option>
 <option>keine</option>
 </select>
 
+Bemerkungen<br>
 <textarea id="bem"></textarea>
 </div>
 
 <div class="box">
 <h2>2. Haufwerk und Proben</h2>
 
-Art des Materials<br>
-<input id="material">
-
-Abfallschlüssel AVV<br>
-<input id="avv">
-
-Volumen des Haufwerks<br>
-<input id="vol">
+Art des Materials<br><input id="material">
+Abfallschlüssel AVV<br><input id="avv">
+Volumen des Haufwerks<br><input id="vol">
 
 Lagerart<br>
 <select id="lagerart">
@@ -89,8 +90,7 @@ Lagerform<br>
 <option>trapezförmig</option>
 </select>
 
-Größtkornklasse<br>
-<input id="korn">
+Größtkornklasse<br><input id="korn">
 
 Volumenberechnungsmethode<br>
 <select id="volmeth">
@@ -99,29 +99,25 @@ Volumenberechnungsmethode<br>
 <option>Messung</option>
 </select>
 
-Vermutete Schadstoffe<br>
-<input id="schad">
+Vermutete Schadstoffe<br><input id="schad">
 
-Einzelproben (EP)<br>
-<input id="ep" type="number">
-
-Mischproben (MP)<br>
-<input id="mp" type="number">
-
-Laborproben (LP)<br>
-<input id="lp" type="number">
+Einzelproben (EP)<br><input id="ep" type="number">
+Mischproben (MP)<br><input id="mp" type="number">
+Laborproben (LP)<br><input id="lp" type="number">
 
 Reduktionsoption genutzt?<br>
 <select id="red">
 <option>nein</option>
 <option>ja</option>
 </select>
-Laborproben reduziert auf<br>
-<input id="lpr">
 
+Laborproben reduziert auf<br><input id="lpr">
+
+Foto Haufwerk 1<br>
 <input type="file" onchange="saveImage(event,'h1')">
 <img id="img_h1">
 
+Foto Haufwerk 2<br>
 <input type="file" onchange="saveImage(event,'h2')">
 <img id="img_h2">
 
@@ -152,19 +148,45 @@ div.className="box";
 
 div.innerHTML=`
 <h3>Mischprobe ${i}</h3>
-<input class="sektor">
-<input class="pid">
-<textarea class="mat"></textarea>
-<select class="kons"><option>fest</option><option>schlammig</option><option>flüssig</option></select>
-<select class="ger"><option>unauffällig</option><option>aromatisch</option><option>muffig</option><option>ölig</option><option>chemisch</option></select>
-<input class="fm">
-<input class="fn">
-<input class="volp">
-<select class="pos"><option>mittig</option><option>links</option><option>rechts</option></select>
-<select class="art"><option>händisch</option><option>mit Schaufel</option><option>mit Bagger</option></select>
-<textarea class="bes"></textarea>
-<input type="file" onchange="saveImage(event,'p${i}_1')"><img id="img_p${i}_1">
-<input type="file" onchange="saveImage(event,'p${i}_2')"><img id="img_p${i}_2">
+
+Sektor-Nr.<br><input class="sektor">
+Proben-ID<br><input class="pid">
+Materialbeschreibung<br><textarea class="mat"></textarea>
+
+Konsistenz<br>
+<select class="kons">
+<option>fest</option><option>schlammig</option><option>flüssig</option>
+</select>
+
+Geruch<br>
+<select class="ger">
+<option>unauffällig</option><option>aromatisch</option><option>muffig</option><option>ölig</option><option>chemisch</option>
+</select>
+
+Fremdstoffe mineralisch<br><input class="fm">
+Fremdstoffe nicht-mineralisch<br><input class="fn">
+
+Volumen L<br><input class="volp">
+
+Entnahmeposition<br>
+<select class="pos">
+<option>mittig</option><option>links</option><option>rechts</option>
+</select>
+
+Probenahmeart<br>
+<select class="art">
+<option>händisch</option><option>mit Schaufel</option><option>mit Bagger</option>
+</select>
+
+Besonderheiten<br><textarea class="bes"></textarea>
+
+Foto 1<br>
+<input type="file" onchange="saveImage(event,'p${i}_1')">
+<img id="img_p${i}_1">
+
+Foto 2<br>
+<input type="file" onchange="saveImage(event,'p${i}_2')">
+<img id="img_p${i}_2">
 `;
 
 container.appendChild(div);
@@ -179,7 +201,6 @@ let doc=new jsPDF();
 let y=30;
 let marginLeft=20;
 
-/* Logo */
 function addLogo(){
 let img=document.getElementById("logoImg");
 if(img.complete){
@@ -192,7 +213,6 @@ doc.addImage(c.toDataURL("image/jpeg",0.6),"JPEG",150,5,30,30*(img.naturalHeight
 }
 }
 
-/* Kopf */
 function addHeader(){
 doc.setFontSize(9);
 doc.text("Projekt: "+projName.value,20,10);
@@ -202,7 +222,6 @@ doc.text("Datum: "+datum.value,140,10);
 doc.line(20,23,190,23);
 }
 
-/* Tabelle */
 function row(label,val){
 doc.setFont("helvetica","bold");
 doc.text(label,marginLeft,y);
@@ -249,7 +268,6 @@ row("LP:",lp.value);
 row("Reduktion:",red.value);
 row("Reduziert auf:",lpr.value);
 
-/* Bilder Haufwerk */
 ["h1","h2"].forEach(k=>{
 if(images[k]){
 doc.addImage(images[k],"JPEG",marginLeft,y,80,60);
