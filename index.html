@@ -214,11 +214,6 @@ doc.addImage(c.toDataURL("image/jpeg",0.6),"JPEG",150,5,30,30*(img.naturalHeight
 }
 
 function addHeader(){
-doc.setFontSize(9);
-doc.text("Projekt: "+projName.value,20,10);
-doc.text("Nr: "+projNr.value,20,15);
-doc.text("Auftraggeber: "+auftraggeber.value,20,20);
-doc.text("Datum: "+datum.value,140,10);
 doc.line(20,23,190,23);
 }
 
@@ -237,7 +232,9 @@ addHeader();
 
 /* Abschnitt 1 */
 doc.setFontSize(12);
-doc.text("1. Allgemeine Daten",marginLeft,y);y+=8;
+doc.setFont("helvetica","bold");
+doc.text("1. Allgemeine Daten",marginLeft,y);
+doc.setFont("helvetica","normal");y+=8;
 
 row("Projektnummer:",projNr.value);
 row("Projekt:",projName.value);
@@ -252,7 +249,9 @@ row("Bemerkungen:",bem.value);
 
 /* Abschnitt 2 */
 doc.setFontSize(12);
-doc.text("2. Haufwerk",marginLeft,y);y+=8;
+doc.setFont("helvetica","bold");
+doc.text("2. Haufwerk",marginLeft,y);
+doc.setFont("helvetica","normal"); y+=8;
 
 row("Material:",material.value);
 row("AVV:",avv.value);
