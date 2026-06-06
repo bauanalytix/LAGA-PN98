@@ -68,39 +68,55 @@ Datum der Probenahme<input id="datum">
 <div class="box">
 <h2>2. Haufwerk und Proben</h2>
 
+Art des Materials<br>
 <input id="material">
+
+Abfallschlüssel AVV<br>
 <input id="avv">
+
+Volumen des Haufwerks<br>
 <input id="vol">
 
+Lagerart<br>
 <select id="lagerart">
 <option>Halde</option>
 <option>Container</option>
 </select>
 
+Lagerform<br>
 <select id="lagerform">
 <option>kegelförmig</option>
 <option>trapezförmig</option>
 </select>
 
+Größtkornklasse<br>
 <input id="korn">
 
+Volumenberechnungsmethode<br>
 <select id="volmeth">
 <option>Schrittmass</option>
 <option>Schätzung</option>
 <option>Messung</option>
 </select>
 
+Vermutete Schadstoffe<br>
 <input id="schad">
 
+Einzelproben (EP)<br>
 <input id="ep" type="number">
+
+Mischproben (MP)<br>
 <input id="mp" type="number">
+
+Laborproben (LP)<br>
 <input id="lp" type="number">
 
+Reduktionsoption genutzt?<br>
 <select id="red">
 <option>nein</option>
 <option>ja</option>
 </select>
-
+Laborproben reduziert auf<br>
 <input id="lpr">
 
 <input type="file" onchange="saveImage(event,'h1')">
