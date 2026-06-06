@@ -1,1 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PN98-Probenahme</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+.box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+input, select, textarea { width: 100%; margin-bottom: 10px; }
+textarea { height:60px; }
+button { padding:10px; margin-top:10px; }
+.logo { position:absolute; top:10px; right:20px; width:140px; height:auto; }
+
+@media (max-width: 600px) {
+  .logo { height: 35px; right: 10px; top: 5px; }
+}
+
+img {
+  max-width: 180px;
+  max-height: 130px;
+  margin-top: 10px;
+  display: block;
+}
+</style>
+</head>
+
+<body>
+
+<img src="bauanalytix_rz_farbe einzeln_klein.jpg" class="logo" id="logoImg">
+
+<h1>PN98-Probenahmeprotokoll</h1>
+
+<div class="box">
+<h2>1. Allgemeine Daten</h2>
+Projektnummer<input id="projNr">
+Projektname<input id="projName">
+Auftraggeber<input id="auftraggeber">
+Probenahmeort<input id="ort">
+Datum der Probenahme<input id="datum">
+
+<select id="verantwortlich">
+<option>Daniela Oehmichen, bauanalytix</option>
+<option>Werner Schalk, bauanalytix</option>
+</select>
+
+<select id="anlass">
+<option>Deklaration zur Entsorgung</option>
+<option>Beweissicherung</option>
+</select>
+
+<select id="nutzung">
+<option>Baustelle</option>
+</select>
+
+<select id="versiegelung">
+<option>Beton</option>
+<option>Pflaster</option>
+<option>keine</option>
+</select>
+
+<textarea id="bem"></textarea>
+</div>
+
+<div class="box">
+<h2>2. Haufwerk und Proben</h2>
+
+<input id="material">
+<input id="avv">
+<input id="vol">
+
+<select id="lagerart">
+<option>Halde</option>
+<option>Container</option>
+</select>
+
+<select id="lagerform">
+<option>kegelförmig</option>
+<option>trapezförmig</option>
+</select>
+
+<input id="korn">
+
+<select id="volmeth">
+<option>Schrittmass</option>
+<option>Schätzung</option>
+<option>Messung</option>
+</select>
+
+<input id="schad">
+
+<input id="ep" type="number">
+<input id="mp" type="number">
+<input id="lp" type="number">
+
+<select id="red">
+<option>nein</option>
+<option>ja</option>
+</select>
+
+<input id="lpr">
+
+<input type="file" onchange="saveImage(event,'h1')">
+<img id="img_h1">
+
+<input type="file" onchange="saveImage(event,'h2')">
+<img id="img_h2">
+
+<button onclick="generateProben()">Mischproben erzeugen</button>
+</div>
+
+<div class="box">
+<h2>3. Mischproben</h2>
+<div id="probenContainer"></div>
+</div>
+
+<button onclick="createPDF()">PDF erstellen</button>
+
+<script>
+
+let images = {};
+
+function generateProben(){
+let mp = parseInt(document.getElementById("mp").value);
+if(isNaN(mp)||mp<=0){alert("Bitte Mischproben eingeben");return;}
+
+let container=document.getElementById("probenContainer");
+container.innerHTML="";
+
+for(let i=1;i<=mp;i++){
+let div=document.createElement("div");
+div.className="box";
+
+div.innerHTML=`
+<h3>Mischprobe ${i}</h3>
+<input class="sektor">
+<input class="pid">
+<textarea class="mat"></textarea>
+<select class="kons"><option>fest</option><option>schlammig</option><option>flüssig</option></select>
+<select class="ger"><option>unauffällig</option><option>aromatisch</option><option>muffig</option><option>ölig</option><option>chemisch</option></select>
+<input class="fm">
+<input class="fn">
+<input class="volp">
+<select class="pos"><option>mittig</option><option>links</option><option>rechts</option></select>
+<select class="art"><option>händisch</option><option>mit Schaufel</option><option>mit Bagger</option></select>
+<textarea class="bes"></textarea>
+<input type="file" onchange="saveImage(event,'p${i}_1')"><img id="img_p${i}_1">
+<input type="file" onchange="saveImage(event,'p${i}_2')"><img id="img_p${i}_2">
+`;
+
+container.appendChild(div);
+}
+}
+
+function createPDF(){
+
+const {jsPDF}=window.jspdf;
+let doc=new jsPDF();
+
+let y=30;
+let marginLeft=20;
+
+/* Logo */
+function addLogo(){
+let img=document.getElementById("logoImg");
+if(img.complete){
+let c=document.createElement("canvas");
+c.width=img.naturalWidth;
+c.height=img.naturalHeight;
+let ctx=c.getContext("2d");
+ctx.drawImage(img,0,0);
+doc.addImage(c.toDataURL("image/jpeg",0.6),"JPEG",150,5,30,30*(img.naturalHeight/img.naturalWidth));
+}
+}
+
+/* Kopf */
+function addHeader(){
+doc.setFontSize(9);
+doc.text("Projekt: "+projName.value,20,10);
+doc.text("Nr: "+projNr.value,20,15);
+doc.text("Auftraggeber: "+auftraggeber.value,20,20);
+doc.text("Datum: "+datum.value,140,10);
+doc.line(20,23,190,23);
+}
+
+/* Tabelle */
+function row(label,val){
+doc.setFont("helvetica","bold");
+doc.text(label,marginLeft,y);
+doc.setFont("helvetica","normal");
+doc.text(String(val||""),marginLeft+70,y);
+doc.line(marginLeft,y+1,190,y+1);
+y+=6;
+if(y>280){doc.addPage();y=30;addLogo();addHeader();}
+}
+
+addLogo();
+addHeader();
+
+/* Abschnitt 1 */
+doc.setFontSize(12);
+doc.text("1. Allgemeine Daten",marginLeft,y);y+=8;
+
+row("Projektnummer:",projNr.value);
+row("Projekt:",projName.value);
+row("Auftraggeber:",auftraggeber.value);
+row("Ort:",ort.value);
+row("Datum:",datum.value);
+row("Verantwortlich:",verantwortlich.value);
+row("Anlass:",anlass.value);
+row("Nutzung:",nutzung.value);
+row("Versiegelung:",versiegelung.value);
+row("Bemerkungen:",bem.value);
+
+/* Abschnitt 2 */
+doc.setFontSize(12);
+doc.text("2. Haufwerk",marginLeft,y);y+=8;
+
+row("Material:",material.value);
+row("AVV:",avv.value);
+row("Volumen:",vol.value);
+row("Lagerart:",lagerart.value);
+row("Lagerform:",lagerform.value);
+row("Korn:",korn.value);
+row("Berechnung:",volmeth.value);
+row("Schadstoffe:",schad.value);
+row("EP:",ep.value);
+row("MP:",mp.value);
+row("LP:",lp.value);
+row("Reduktion:",red.value);
+row("Reduziert auf:",lpr.value);
+
+/* Bilder Haufwerk */
+["h1","h2"].forEach(k=>{
+if(images[k]){
+doc.addImage(images[k],"JPEG",marginLeft,y,80,60);
+y+=65;
+}
+});
+
+/* Abschnitt 3 */
+doc.addPage();y=30;addLogo();addHeader();
+
+doc.setFontSize(12);
+doc.text("3. Mischproben",marginLeft,y);y+=10;
+
+let blocks=document.querySelectorAll("#probenContainer .box");
+
+blocks.forEach((b,i)=>{
+if(i>0){doc.addPage();y=30;addLogo();addHeader();}
+
+row("Sektor:",b.querySelector(".sektor").value);
+row("ID:",b.querySelector(".pid").value);
+row("Material:",b.querySelector(".mat").value);
+row("Konsistenz:",b.querySelector(".kons").value);
+row("Geruch:",b.querySelector(".ger").value);
+row("FM:",b.querySelector(".fm").value);
+row("FN:",b.querySelector(".fn").value);
+row("Volumen:",b.querySelector(".volp").value);
+row("Position:",b.querySelector(".pos").value);
+row("Art:",b.querySelector(".art").value);
+row("Besonderheiten:",b.querySelector(".bes").value);
+
+["p"+(i+1)+"_1","p"+(i+1)+"_2"].forEach(k=>{
+if(images[k]){
+doc.addImage(images[k],"JPEG",marginLeft,y,80,60);
+y+=65;
+}
+});
+});
+
+doc.save("PN98_Protokoll.pdf");
+}
+
+function setDatumZeit(){
+let n=new Date();
+datum.value=n.toLocaleDateString("de-DE")+" "+n.toLocaleTimeString("de-DE",{hour:'2-digit',minute:'2-digit'});
+}
+
+window.onload=setDatumZeit;
+
+function saveImage(e,k){
+let f=e.target.files[0];
+if(!f)return;
+let r=new FileReader();
+r.onload=x=>{
+let i=new Image();
+i.onload=()=>{
+let c=document.createElement("canvas");
+let s=800/i.width;
+c.width=800;c.height=i.height*s;
+c.getContext("2d").drawImage(i,0,0,c.width,c.height);
+images[k]=c.toDataURL("image/jpeg",0.7);
+document.getElementById("img_"+k).src=images[k];
+};
+i.src=x.target.result;
+};
+r.readAsDataURL(f);
+}
+</script>
+
+</body>
+</html>
