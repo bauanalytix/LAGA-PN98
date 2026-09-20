@@ -26,6 +26,7 @@ window.PNExport = (() => {
     function row(label, value) {
       doc.setFontSize(11); doc.setFont('helvetica', 'normal');
       const lines = doc.splitTextToSize(String(value || ''), right - valueLeft);
+      doc.setFont('helvetica', 'bold');
       const labelLines = doc.splitTextToSize(label, valueLeft - left - 5);
       const count = Math.max(lines.length, labelLines.length);
       for (let offset = 0; offset < count;) {
@@ -61,7 +62,7 @@ window.PNExport = (() => {
     if (record.samples.length) {
       record.samples.forEach((sample, i) => {
         page(); heading('3. Mischproben · Mischprobe ' + (i + 1));
-        [['Sektor:', 'sektor'], ['ID:', 'pid'], ['Material:', 'mat'], ['Konsistenz:', 'kons'], ['Geruch:', 'ger'], ['FM:', 'fm'], ['FN:', 'fn'], ['Volumen:', 'volp'], ['Position:', 'pos'], ['Art:', 'art'], ['Besonderheiten:', 'bes']].forEach(([label, key]) => row(label, sample[key]));
+        [['Sektor:', 'sektor'], ['ID:', 'pid'], ['Material:', 'mat'], ['Konsistenz:', 'kons'], ['Geruch:', 'ger'], ['Fremdbestandteile mineralisch:', 'fm'], ['Fremdbestandteile nicht mineralisch:', 'fn'], ['Volumen:', 'volp'], ['Position:', 'pos'], ['Art:', 'art'], ['Besonderheiten:', 'bes']].forEach(([label, key]) => row(label, sample[key]));
         photo('p' + (i + 1) + '_1', 'Mischprobe ' + (i + 1) + ' · Foto 1');
         photo('p' + (i + 1) + '_2', 'Mischprobe ' + (i + 1) + ' · Foto 2');
       });

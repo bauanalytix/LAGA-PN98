@@ -36,7 +36,7 @@ async function run() {
       const file = path.resolve(root, name);
       if (!file.startsWith(root + path.sep)) { res.writeHead(403); res.end(); return; }
       let data = await fs.readFile(file);
-      if (name === 'sw.js' && swRevision) data = Buffer.from(data.toString().replace('v2-20260920', swRevision));
+      if (name === 'sw.js' && swRevision) data = Buffer.from(data.toString().replace(/bauanalytix-pn98-shell-[^']+/, 'bauanalytix-pn98-shell-' + swRevision));
       const types = { '.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.webmanifest':'application/manifest+json', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg' };
       res.writeHead(200, { 'Content-Type': (types[path.extname(name)] || 'application/octet-stream'), 'Cache-Control': 'no-store' }); res.end(data);
     } catch (_) { res.writeHead(404); res.end(); }
@@ -156,6 +156,36 @@ async function run() {
   await page.waitForFunction(() => document.querySelector('#bem')?.value === 'Vor App-Update gespeichert' && !document.querySelector('#protocolFields').disabled);
   await page.waitForFunction(async () => (await caches.keys()).includes('bauanalytix-pn98-shell-v2-test-update'));
   assert.equal((await records(page)).length, 5); check('App update activates after saving and preserves project storage');
+  const source = (await records(page)).find(record => record.fields.projNr === 'TEST-3p');
+  assert.equal(await page.locator('#installHelp').count(), 0);
+  assert.equal(await page.locator('#saveStatus').isVisible(), false);
+  assert.ok(await page.evaluate(() => document.querySelector('#createPDF').compareDocumentPosition(document.querySelector('#backupHelp')) & Node.DOCUMENT_POSITION_FOLLOWING));
+  await page.click('#copyProject');
+  await page.waitForFunction(() => document.querySelector('#copyDialog').open);
+  await page.screenshot({ path: path.join(qa, 'mobile-copy.png') });
+  await page.click('#cancelCopy'); assert.equal((await records(page)).length, 5);
+  await page.click('#copyProject'); await page.fill('#copyNumber', ' test-3Q ');
+  await page.click('#copyForm button[type=submit]');
+  await page.waitForFunction(() => !document.querySelector('#copyError').hidden);
+  assert.equal((await records(page)).length, 5);
+  assert.equal(await page.inputValue('#projNr'), 'TEST-3p');
+  await page.fill('#copyNumber', 'TEST-NEU'); await page.click('#copyForm button[type=submit]');
+  await page.waitForFunction(() => !document.querySelector('#copyDialog').open && !document.querySelector('#protocolFields').disabled);
+  assert.equal(await page.inputValue('#projNr'), 'TEST-NEU');
+  const copied = (await records(page)).find(record => record.fields.projNr === 'TEST-NEU');
+  assert.notEqual(copied.id, source.id);
+  assert.deepEqual(copied.fields, { ...source.fields, projNr: 'TEST-NEU' });
+  assert.deepEqual(copied.images, {});
+  assert.equal(copied.samples.length, 3);
+  copied.samples.forEach((sample, index) => {
+    assert.equal(sample.pid, source.samples[index].pid);
+    assert.ok(Object.entries(sample).every(([key, value]) => key === 'pid' || value === ''));
+  });
+  assert.deepEqual((await records(page)).find(record => record.id === source.id), source);
+  await page.fill('#sample1_pid', 'TEST-NEU-01'); await waitSaved(page);
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#sample1_pid')?.value === 'TEST-NEU-01');
+  assert.deepEqual((await records(page)).find(record => record.id === source.id), source);
+  check('Project copy preserves source and sample IDs, excludes photos/findings, rejects duplicate numbers and survives reload');
   await page.setViewportSize({ width: 1280, height: 900 }); await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: path.join(qa, 'desktop.png') });
   assert.deepEqual(errors, []);

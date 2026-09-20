@@ -18,29 +18,15 @@
 <header class="page-header">
 <img src="bauanalytix_rz_farbe einzeln_klein.jpg" class="logo" id="logoImg" alt="bauanalytix">
 <h1>PN98-Probenahmeprotokoll</h1>
-<p>Protokolle vor Ort erfassen und später als PDF ausgeben.</p>
 </header>
 <main>
 <section class="box projects" aria-labelledby="projectsTitle">
 <div class="section-heading"><h2 id="projectsTitle">Meine Projekte</h2><span id="offlineStatus" class="badge" role="status">App wird geladen …</span></div>
 <label for="projectList">Gespeicherte Protokolle</label>
 <div class="project-picker"><select id="projectList" aria-label="Gespeicherte Protokolle"><option value="">Noch keine gespeicherten Protokolle</option></select><button id="openProject" type="button">Öffnen</button></div>
-<div class="actions"><button id="newProject" type="button">Neues Projekt</button><button id="saveProject" type="button" class="primary">Jetzt speichern</button><button id="deleteProject" type="button" class="danger">Projekt löschen</button></div>
+<div class="actions"><button id="newProject" type="button">Neues Projekt</button><button id="copyProject" type="button">Daten übernehmen</button><button id="saveProject" type="button" class="primary">Jetzt speichern</button><button id="deleteProject" type="button" class="danger">Projekt löschen</button></div>
 <p id="saveStatus" role="status" aria-live="polite">Speicher wird geöffnet …</p>
-<p class="hint">Änderungen werden automatisch auf diesem Gerät gespeichert, einschließlich Fotos. Verwende für jedes Haufwerk seine eigene Projektnummer, z. B. 2026001-3a. Auch unvollständige Protokolle bleiben erhalten.</p>
 <div id="conflictActions" class="actions" hidden><button id="saveConflictCopy" type="button">Meinen Stand als Kopie behalten</button></div>
-<details><summary>Sicherung und Gerätewechsel</summary>
-<p>Die Projekte werden nicht automatisch mit anderen Geräten synchronisiert. Lade eine Sicherung herunter, um sie aufzubewahren oder auf einem anderen Gerät einzulesen. Beim Löschen von Browserdaten können die lokalen Projekte verloren gehen.</p>
-<div class="actions"><button id="exportBackup" type="button">Alle Projekte sichern</button><button id="importBackup" type="button">Sicherung einlesen</button></div>
-<input id="backupFile" type="file" accept=".json,application/json" hidden><p id="backupStatus" role="status"></p>
-</details>
-<details id="installHelp"><summary>Auf dem Android-Handy installieren</summary>
-<ol><li>Diese Seite auf dem Handy in <strong>Chrome</strong> öffnen. Du kannst dazu den QR-Code mit der Handykamera scannen.</li><li>Auf „App installieren“ tippen. Alternativ im Chrome-Menü ⋮ „Zum Startbildschirm hinzufügen“ und „Installieren“ wählen. Je nach Chrome-Version heißt der Menüpunkt „Installieren und Verknüpfung erstellen“.</li><li>Vor der Baustelle einmal mit Internet öffnen, bis oben <strong>„Offline bereit“</strong> steht. Danach kannst du die App auch ohne Netz starten.</li></ol>
-<button id="installApp" type="button" class="primary" hidden>App installieren</button>
-<img class="qr" src="icons/app-qr.svg" alt="QR-Code zum Öffnen der PN98-App auf dem Handy" width="200" height="200">
-<a href="https://bauanalytix.github.io/LAGA-PN98/">bauanalytix.github.io/LAGA-PN98/</a>
-<p class="hint">Die Installation übernimmt die in Chrome auf diesem Handy gespeicherten Protokolle. Ein ChatGPT-Chat wird dafür nicht benötigt.</p>
-</details>
 <button id="updateApp" type="button" hidden>Neue App-Version laden</button>
 <p id="notice" role="alert" hidden></p>
 </section>
@@ -82,8 +68,25 @@
 <section class="box" aria-labelledby="samplesTitle"><h2 id="samplesTitle">3. Mischproben</h2><div id="probenContainer"><p>Noch keine Mischproben angelegt.</p></div></section>
 </fieldset></form>
 <div class="bottom-bar"><button id="createPDF" type="button" class="primary">PDF für dieses Projekt erstellen</button><span id="activeProject">Neues Protokoll</span></div>
+<details class="box" id="backupHelp"><summary>Sicherung und Gerätewechsel</summary>
+<p>Die Projekte werden nicht automatisch mit anderen Geräten synchronisiert. Lade eine Sicherung herunter, um sie aufzubewahren oder auf einem anderen Gerät einzulesen. Beim Löschen von Browserdaten können die lokalen Projekte verloren gehen.</p>
+<div class="actions"><button id="exportBackup" type="button">Alle Projekte sichern</button><button id="importBackup" type="button">Sicherung einlesen</button></div>
+<input id="backupFile" type="file" accept=".json,application/json" hidden><p id="backupStatus" role="status"></p>
+</details>
 </main>
-<footer>PN98-Probenahme · bauanalytix · Version 2.0</footer>
+<dialog id="copyDialog" aria-labelledby="copyTitle">
+<form id="copyForm">
+<h2 id="copyTitle">Neues Projekt aus Vorlage</h2>
+<fieldset id="copyFields">
+<label>Angaben übernehmen aus<select id="copySource" required></select></label>
+<label>Neue Projektnummer<input id="copyNumber" required maxlength="100" spellcheck="false" autocapitalize="off" autocomplete="off"></label>
+<p class="hint">Grunddaten, Haufwerksangaben, Probenumfang und Proben-IDs werden übernommen. Fotos und die übrigen Mischprobendetails bleiben leer.</p>
+<p id="copyError" class="error" role="alert" hidden></p>
+<div class="actions"><button type="submit" class="primary">Neues Projekt anlegen</button><button id="cancelCopy" type="button">Abbrechen</button></div>
+</fieldset>
+</form>
+</dialog>
+<footer>PN98-Probenahme · bauanalytix · Version 2.1</footer>
 <noscript>Bitte JavaScript aktivieren, um Protokolle zu erfassen und zu speichern.</noscript>
 </body>
 </html>

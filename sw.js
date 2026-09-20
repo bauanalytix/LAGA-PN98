@@ -1,5 +1,5 @@
 'use strict';
-const CACHE = 'bauanalytix-pn98-shell-v2-20260920';
+const CACHE = 'bauanalytix-pn98-shell-v2.1-20260920';
 const ASSETS = ['./', './index.html', './styles.css', './storage.js', './app.js', './pdf.js', './vendor/jspdf.umd.min.js', './manifest.webmanifest', './bauanalytix_rz_farbe%20einzeln_klein.jpg', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable.png', './icons/app-qr.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));

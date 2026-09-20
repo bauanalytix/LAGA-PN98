@@ -13,13 +13,14 @@
   const LAST = 'bauanalytix-pn98-last-project';
   const defaults = Object.fromEntries(FIELDS.map(id => [id, $(id).value]));
   let active, dirty = false, editVersion = 0, saveQueue = Promise.resolve(true), busy = false;
-  let offlineReady = false, deferredInstall, registration, updating = false;
+  let offlineReady = false, registration, updating = false;
   const uuid = () => crypto.randomUUID();
   function newRecord() {
     return { id: uuid(), revision: 0, fields: { ...defaults, datum: new Date().toLocaleString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) }, samples: [], images: {} };
   }
   function status(message, error = false) {
     $('saveStatus').textContent = message;
+    $('saveStatus').hidden = !message;
     $('saveStatus').classList.toggle('error', error);
   }
   function notice(message = '') { $('notice').textContent = message; $('notice').hidden = !message; }
@@ -143,7 +144,7 @@
     }
     $('pilePhotos').replaceChildren(photoControl('h1', 'Foto Haufwerk 1'), photoControl('h2', 'Foto Haufwerk 2'));
     renderSamples(); $('activeProject').textContent = title(record); $('conflictActions').hidden = true;
-    status(record.revision ? 'Gespeichertes Projekt geöffnet · ' + title(record) : 'Neues Protokoll – wird ab der ersten Eingabe automatisch gespeichert.');
+    status('');
   }
   async function compressImage(file) {
     if (!file.type.startsWith('image/')) throw new Error('Bitte eine Bilddatei auswählen.');
@@ -188,6 +189,47 @@
     if (!await save()) return;
     render(newRecord()); remember(''); await refreshList(active.id); $('projNr').focus();
   }));
+  $('copyProject').addEventListener('click', () => action(async () => {
+    const selected = $('projectList').value || active.id;
+    if (!await save()) return;
+    const records = await PNStore.list();
+    if (!records.length) { notice('Bitte zuerst ein Projekt als Vorlage speichern.'); return; }
+    records.sort((a, b) => title(a).localeCompare(title(b), 'de', { numeric: true }));
+    $('copySource').replaceChildren(...records.map(record => new Option(title(record) + (record.fields.projName ? ' · ' + record.fields.projName : ''), record.id)));
+    if (records.some(record => record.id === selected)) $('copySource').value = selected;
+    $('copyNumber').value = ''; $('copyError').hidden = true;
+    $('copyDialog').showModal(); $('copyNumber').focus();
+  }));
+  $('cancelCopy').addEventListener('click', () => $('copyDialog').close());
+  $('copyDialog').addEventListener('cancel', event => { if (busy) event.preventDefault(); });
+  $('copyForm').addEventListener('submit', event => {
+    event.preventDefault();
+    void action(async () => {
+      const sourceId = $('copySource').value, number = $('copyNumber').value.trim();
+      $('copyError').hidden = true; $('copyFields').disabled = true;
+      try {
+        if (!number) throw new Error('Bitte eine neue Projektnummer eingeben.');
+        const source = await PNStore.get(sourceId);
+        if (!source) throw new Error('Die Vorlage wurde inzwischen gelöscht. Bitte ein anderes Projekt auswählen.');
+        const copy = newRecord();
+        copy.fields = { ...source.fields, projNr: number };
+        copy.samples = source.samples.map(sample => ({
+          ...Object.fromEntries(SAMPLE_FIELDS.map(([key]) => [key, ''])), pid: sample.pid || ''
+        }));
+        copy.images = {};
+        // Persist a separate record before leaving the current project. Never write to the source.
+        const saved = await PNStore.write(copy, 0);
+        render(saved); remember(saved.id); await refreshList(saved.id);
+        $('copyDialog').close(); $('projNr').focus();
+      } catch (error) {
+        $('copyError').textContent = error.code === 'DUPLICATE'
+          ? 'Diese Projektnummer ist bereits vorhanden. Bitte eine andere Nummer verwenden.'
+          : error.name === 'QuotaExceededError' ? 'Das neue Projekt konnte wegen fehlendem Speicherplatz nicht angelegt werden. Die Vorlage bleibt erhalten.'
+          : error.message || 'Das neue Projekt konnte nicht angelegt werden. Die Vorlage bleibt erhalten.';
+        $('copyError').hidden = false;
+      } finally { $('copyFields').disabled = false; }
+    });
+  });
   $('openProject').addEventListener('click', () => action(async () => {
     const id = $('projectList').value; if (!id) { notice('Bitte zuerst ein gespeichertes Protokoll auswählen.'); return; }
     if (!await save()) return;
@@ -246,14 +288,10 @@
   window.addEventListener('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
   function connectionStatus() { $('offlineStatus').textContent = offlineReady ? (navigator.onLine ? 'Offline bereit' : 'Offline · bereit') : (navigator.onLine ? 'Offline-Vorbereitung läuft …' : 'Offline noch nicht bereit'); }
   window.addEventListener('online', connectionStatus); window.addEventListener('offline', connectionStatus);
-  window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); deferredInstall = event; $('installApp').hidden = false; });
-  $('installApp').addEventListener('click', async () => {
-    if (!deferredInstall) return; await deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; $('installApp').hidden = true;
-  });
-  window.addEventListener('appinstalled', () => { $('installApp').hidden = true; });
   $('updateApp').addEventListener('click', () => action(async () => {
     if (!await save()) return;
-    if (registration?.waiting) { updating = true; registration.waiting.postMessage('ACTIVATE_UPDATE'); }
+    const waiting = (await navigator.serviceWorker.getRegistration())?.waiting;
+    if (waiting) { updating = true; waiting.postMessage('ACTIVATE_UPDATE'); }
   }));
   async function setupOffline() {
     if (!('serviceWorker' in navigator) || !window.isSecureContext) { $('offlineStatus').textContent = 'Offline-Modus benötigt HTTPS'; return; }
@@ -264,8 +302,8 @@
         const worker = registration.installing;
         worker?.addEventListener('statechange', () => { if (worker.state === 'installed') showUpdate(); });
       });
-      navigator.serviceWorker.addEventListener('controllerchange', () => { if (updating) location.reload(); });
-      await navigator.serviceWorker.ready; offlineReady = true; connectionStatus();
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (updating) location.reload(); else showUpdate(); });
+      await navigator.serviceWorker.ready; offlineReady = true; connectionStatus(); showUpdate();
     } catch (error) { $('offlineStatus').textContent = 'Offline-Vorbereitung fehlgeschlagen'; console.error(error); }
   }
   async function start() {
