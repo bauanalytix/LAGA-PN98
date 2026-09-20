@@ -2,345 +2,88 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#a82d30">
+<meta name="description" content="PN98-Probenahmeprotokolle mit Projektspeicher, Fotos und PDF. Auch ohne Netz arbeiten.">
 <title>PN98-Probenahme</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
-body { font-family: Arial; margin: 20px; background: #f5f5f5; }
-.box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
-input, select, textarea { width: 100%; margin-bottom: 10px; }
-textarea { height:60px; }
-button { padding:10px; margin-top:10px; }
-.logo { position:absolute; top:10px; right:20px; width:140px; height:auto; }
-
-@media (max-width: 600px) {
-  .logo { height: 35px; right: 10px; top: 5px; }
-}
-
-img {
-  max-width: 180px;
-  max-height: 130px;
-  margin-top: 10px;
-  display: block;
-}
-</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="vendor/jspdf.umd.min.js" defer></script>
+<script src="storage.js" defer></script>
+<script src="pdf.js" defer></script>
+<script src="app.js" defer></script>
 </head>
-
 <body>
-
-<img src="bauanalytix_rz_farbe einzeln_klein.jpg" class="logo" id="logoImg">
-
+<header class="page-header">
+<img src="bauanalytix_rz_farbe einzeln_klein.jpg" class="logo" id="logoImg" alt="bauanalytix">
 <h1>PN98-Probenahmeprotokoll</h1>
-
-<div class="box">
-<h2>1. Allgemeine Daten</h2>
-
-Projektnummer<br><input id="projNr">
-Projektname<br><input id="projName">
-Auftraggeber<br><input id="auftraggeber">
-Probenahmeort<br><input id="ort">
-Datum der Probenahme<br><input id="datum">
-
-Projektverantwortliche<br>
-<select id="verantwortlich">
-<option>Daniela Oehmichen, bauanalytix</option>
-<option>Werner Schalk, bauanalytix</option>
-</select>
-
-Anlass der Probennahme<br>
-<select id="anlass">
-<option>Deklaration zur Entsorgung</option>
-<option>Beweissicherung</option>
-</select>
-
-Aktuelle Flächennutzung<br>
-<select id="nutzung">
-<option>Baustelle</option>
-</select>
-
-Oberflächenversiegelung<br>
-<select id="versiegelung">
-<option>Beton</option>
-<option>Pflaster</option>
-<option>keine</option>
-</select>
-
-Bemerkungen<br>
-<textarea id="bem"></textarea>
+<p>Protokolle vor Ort erfassen und später als PDF ausgeben.</p>
+</header>
+<main>
+<section class="box projects" aria-labelledby="projectsTitle">
+<div class="section-heading"><h2 id="projectsTitle">Meine Projekte</h2><span id="offlineStatus" class="badge" role="status">App wird geladen …</span></div>
+<label for="projectList">Gespeicherte Protokolle</label>
+<div class="project-picker"><select id="projectList" aria-label="Gespeicherte Protokolle"><option value="">Noch keine gespeicherten Protokolle</option></select><button id="openProject" type="button">Öffnen</button></div>
+<div class="actions"><button id="newProject" type="button">Neues Projekt</button><button id="saveProject" type="button" class="primary">Jetzt speichern</button><button id="deleteProject" type="button" class="danger">Projekt löschen</button></div>
+<p id="saveStatus" role="status" aria-live="polite">Speicher wird geöffnet …</p>
+<p class="hint">Änderungen werden automatisch auf diesem Gerät gespeichert, einschließlich Fotos. Verwende für jedes Haufwerk seine eigene Projektnummer, z. B. 2026001-3a. Auch unvollständige Protokolle bleiben erhalten.</p>
+<div id="conflictActions" class="actions" hidden><button id="saveConflictCopy" type="button">Meinen Stand als Kopie behalten</button></div>
+<details><summary>Sicherung und Gerätewechsel</summary>
+<p>Die Projekte werden nicht automatisch mit anderen Geräten synchronisiert. Lade eine Sicherung herunter, um sie aufzubewahren oder auf einem anderen Gerät einzulesen. Beim Löschen von Browserdaten können die lokalen Projekte verloren gehen.</p>
+<div class="actions"><button id="exportBackup" type="button">Alle Projekte sichern</button><button id="importBackup" type="button">Sicherung einlesen</button></div>
+<input id="backupFile" type="file" accept=".json,application/json" hidden><p id="backupStatus" role="status"></p>
+</details>
+<details id="installHelp"><summary>Auf dem Android-Handy installieren</summary>
+<ol><li>Diese Seite auf dem Handy in <strong>Chrome</strong> öffnen. Du kannst dazu den QR-Code mit der Handykamera scannen.</li><li>Auf „App installieren“ tippen. Alternativ im Chrome-Menü ⋮ „Zum Startbildschirm hinzufügen“ und „Installieren“ wählen. Je nach Chrome-Version heißt der Menüpunkt „Installieren und Verknüpfung erstellen“.</li><li>Vor der Baustelle einmal mit Internet öffnen, bis oben <strong>„Offline bereit“</strong> steht. Danach kannst du die App auch ohne Netz starten.</li></ol>
+<button id="installApp" type="button" class="primary" hidden>App installieren</button>
+<img class="qr" src="icons/app-qr.svg" alt="QR-Code zum Öffnen der PN98-App auf dem Handy" width="200" height="200">
+<a href="https://bauanalytix.github.io/LAGA-PN98/">bauanalytix.github.io/LAGA-PN98/</a>
+<p class="hint">Die Installation übernimmt die in Chrome auf diesem Handy gespeicherten Protokolle. Ein ChatGPT-Chat wird dafür nicht benötigt.</p>
+</details>
+<button id="updateApp" type="button" hidden>Neue App-Version laden</button>
+<p id="notice" role="alert" hidden></p>
+</section>
+<form id="protocolForm" autocomplete="off"><fieldset id="protocolFields" disabled>
+<section class="box" aria-labelledby="generalTitle"><h2 id="generalTitle">1. Allgemeine Daten</h2>
+<div class="field-grid">
+<label>Projektnummer<input id="projNr" maxlength="100" spellcheck="false" autocapitalize="off" placeholder="z. B. 2026001-3a"></label>
+<label>Projektname<input id="projName"></label>
+<label>Auftraggeber<input id="auftraggeber"></label>
+<label>Probenahmeort<input id="ort"></label>
+<label>Datum der Probenahme<input id="datum" placeholder="TT.MM.JJJJ, Uhrzeit"></label>
+<label>Projektverantwortliche<select id="verantwortlich"><option>Daniela Oehmichen, bauanalytix</option><option>Werner Schalk, bauanalytix</option></select></label>
+<label>Anlass der Probennahme<select id="anlass"><option>Deklaration zur Entsorgung</option><option>Beweissicherung</option></select></label>
+<label>Aktuelle Flächennutzung<select id="nutzung"><option>Baustelle</option></select></label>
+<label>Oberflächenversiegelung<select id="versiegelung"><option>Beton</option><option>Pflaster</option><option>keine</option></select></label>
+<label class="wide">Bemerkungen<textarea id="bem"></textarea></label>
+</div></section>
+<section class="box" aria-labelledby="pileTitle"><h2 id="pileTitle">2. Haufwerk und Proben</h2>
+<div class="field-grid">
+<label>Art des Materials<input id="material"></label><label>Abfallschlüssel AVV<input id="avv"></label>
+<label>Volumen des Haufwerks<input id="vol"></label>
+<label>Lagerart<select id="lagerart"><option>Halde</option><option>Container</option></select></label>
+<label>Freitext Lagerart<input id="lagerart_text"></label>
+<label>Lagerform<select id="lagerform"><option>kegelförmig</option><option>trapezförmig</option><option>BigBags</option></select></label>
+<label>Freitext Lagerform<input id="lagerform_text"></label>
+<label>Größtkornklasse<input id="korn"></label>
+<label>Volumenberechnungsmethode<select id="volmeth"><option>Schrittmass</option><option>Schätzung</option><option>Messung</option><option>Zählung</option></select></label>
+<label>Vermutete Schadstoffe<input id="schad"></label>
+<label>Einzelproben (EP)<input id="ep" type="number" min="0" step="1" inputmode="numeric"></label>
+<label>Mischproben (MP)<input id="mp" type="number" min="1" max="200" step="1" inputmode="numeric"></label>
+<label>Laborproben (LP)<input id="lp" type="number" min="0" step="1" inputmode="numeric"></label>
+<label>Reduktionsoption genutzt?<select id="red"><option>nein</option><option>ja</option></select></label>
+<label>Laborproben reduziert auf<input id="lpr"></label>
 </div>
-
-<div class="box">
-<h2>2. Haufwerk und Proben</h2>
-
-Art des Materials<br><input id="material">
-Abfallschlüssel AVV<br><input id="avv">
-Volumen des Haufwerks<br><input id="vol">
-
-Lagerart<br>
-<select id="lagerart">
-<option>Halde</option>
-<option>Container</option>
-</select>
-Freitext Lagerart<br>
-<input id="lagerart_text">
-  
-Lagerform<br>
-<select id="lagerform">
-<option>kegelförmig</option>
-<option>trapezförmig</option>
-  <option>BigBags</option>
-</select>
-Freitext Lagerform<br>
-<input id="lagerform_text">
-  
-Größtkornklasse<br><input id="korn">
-
-Volumenberechnungsmethode<br>
-<select id="volmeth">
-<option>Schrittmass</option>
-<option>Schätzung</option>
-<option>Messung</option>
-  <option>Zählung</option>
-</select>
-
-Vermutete Schadstoffe<br><input id="schad">
-
-Einzelproben (EP)<br><input id="ep" type="number">
-Mischproben (MP)<br><input id="mp" type="number">
-Laborproben (LP)<br><input id="lp" type="number">
-
-Reduktionsoption genutzt?<br>
-<select id="red">
-<option>nein</option>
-<option>ja</option>
-</select>
-
-Laborproben reduziert auf<br><input id="lpr">
-
-Foto Haufwerk 1<br>
-<input type="file" onchange="saveImage(event,'h1')">
-<img id="img_h1">
-
-Foto Haufwerk 2<br>
-<input type="file" onchange="saveImage(event,'h2')">
-<img id="img_h2">
-
-<button onclick="generateProben()">Mischproben erzeugen</button>
-</div>
-
-<div class="box">
-<h2>3. Mischproben</h2>
-<div id="probenContainer"></div>
-</div>
-
-<button onclick="createPDF()">PDF erstellen</button>
-
-<script>
-
-let images = {};
-
-function generateProben(){
-let mp = parseInt(document.getElementById("mp").value);
-if(isNaN(mp)||mp<=0){alert("Bitte Mischproben eingeben");return;}
-
-let container=document.getElementById("probenContainer");
-container.innerHTML="";
-
-for(let i=1;i<=mp;i++){
-let div=document.createElement("div");
-div.className="box";
-
-div.innerHTML=`
-<h3>Mischprobe ${i}</h3>
-
-Sektor-Nr.<br><input class="sektor">
-Proben-ID<br><input class="pid">
-Materialbeschreibung<br><textarea class="mat"></textarea>
-
-Konsistenz<br>
-<select class="kons">
-<option>fest</option><option>schlammig</option><option>flüssig</option>
-</select>
-
-Geruch<br>
-<select class="ger">
-<option>unauffällig</option><option>aromatisch</option><option>muffig</option><option>ölig</option><option>chemisch</option>
-</select>
-
-Fremdstoffe mineralisch<br><input class="fm">
-Fremdstoffe nicht-mineralisch<br><input class="fn">
-
-Volumen L<br><input class="volp">
-
-Entnahmeposition<br>
-<select class="pos">
-<option>mittig</option><option>links</option><option>rechts</option>
-</select>
-
-Probenahmeart<br>
-<select class="art">
-<option>händisch</option><option>mit Schaufel</option><option>mit Bagger</option>
-</select>
-
-Besonderheiten<br><textarea class="bes"></textarea>
-
-Foto 1<br>
-<input type="file" onchange="saveImage(event,'p${i}_1')">
-<img id="img_p${i}_1">
-
-Foto 2<br>
-<input type="file" onchange="saveImage(event,'p${i}_2')">
-<img id="img_p${i}_2">
-`;
-
-container.appendChild(div);
-}
-}
-
-function createPDF(){
-
-const {jsPDF}=window.jspdf;
-let doc=new jsPDF();
-
-let y=30;
-let marginLeft=20;
-
-function addLogo(){
-let img=document.getElementById("logoImg");
-if(img.complete){
-let c=document.createElement("canvas");
-c.width=img.naturalWidth;
-c.height=img.naturalHeight;
-let ctx=c.getContext("2d");
-ctx.drawImage(img,0,0);
-doc.addImage(c.toDataURL("image/jpeg",0.6),"JPEG",150,5,30,30*(img.naturalHeight/img.naturalWidth));
-}
-}
-
-function addHeader(){
-doc.line(20,23,190,23);
-}
-
-function row(label,val){
-doc.setFont("helvetica","bold");
-doc.text(label,marginLeft,y);
-doc.setFont("helvetica","normal");
-doc.text(String(val||""),marginLeft+70,y);
-doc.line(marginLeft,y+1,190,y+1);
-y+=6;
-if(y>280){doc.addPage();y=30;addLogo();addHeader();}
-}
-
-addLogo();
-addHeader();
-
-/* Abschnitt 1 */
-doc.setFontSize(12);
-doc.setFont("helvetica","bold");
-doc.text("1. Allgemeine Daten",marginLeft,y);
-doc.setFont("helvetica","normal");y+=8;
-
-row("Projektnummer:",projNr.value);
-row("Projekt:",projName.value);
-row("Auftraggeber:",auftraggeber.value);
-row("Ort:",ort.value);
-row("Datum:",datum.value);
-row("Verantwortlich:",verantwortlich.value);
-row("Anlass:",anlass.value);
-row("Nutzung:",nutzung.value);
-row("Versiegelung:",versiegelung.value);
-row("Bemerkungen:",bem.value);
-
-/* Abschnitt 2 */
-y += 6;
-doc.setFontSize(12);
-doc.setFont("helvetica","bold");
-doc.text("2. Haufwerk",marginLeft,y);
-doc.setFont("helvetica","normal"); y+=8;
-
-row("Material:",material.value);
-row("AVV:",avv.value);
-row("Volumen:",vol.value);
-row("Lagerart:", lagerart.value + " " + (lagerart_text.value || ""));
-row("Lagerform:", lagerform.value + " " + (lagerform_text.value || ""));
-row("Korn:",korn.value);
-row("Berechnung:",volmeth.value);
-row("Schadstoffe:",schad.value);
-row("EP:",ep.value);
-row("MP:",mp.value);
-row("LP:",lp.value);
-row("Reduktion:",red.value);
-row("Reduziert auf:",lpr.value);
-
-["h1","h2"].forEach(k=>{
-if(images[k]){
-doc.addImage(images[k],"JPEG",marginLeft,y,80,60);
-y+=65;
-}
-});
-
-/* Abschnitt 3 */
-doc.addPage();y=30;addLogo();addHeader();
-
-doc.setFontSize(12);
-doc.text("3. Mischproben",marginLeft,y);y+=10;
-
-let blocks=document.querySelectorAll("#probenContainer .box");
-
-blocks.forEach((b,i)=>{
-if(i>0){doc.addPage();y=30;addLogo();addHeader();}
-
-row("Sektor:",b.querySelector(".sektor").value);
-row("ID:",b.querySelector(".pid").value);
-row("Material:",b.querySelector(".mat").value);
-row("Konsistenz:",b.querySelector(".kons").value);
-row("Geruch:",b.querySelector(".ger").value);
-row("FM:",b.querySelector(".fm").value);
-row("FN:",b.querySelector(".fn").value);
-row("Volumen:",b.querySelector(".volp").value);
-row("Position:",b.querySelector(".pos").value);
-row("Art:",b.querySelector(".art").value);
-row("Besonderheiten:",b.querySelector(".bes").value);
-
-["p"+(i+1)+"_1","p"+(i+1)+"_2"].forEach(k=>{
-if(images[k]){
-doc.addImage(images[k],"JPEG",marginLeft,y,80,60);
-y+=65;
-}
-});
-});
-
-doc.save("PN98_Protokoll.pdf");
-}
-
-function setDatumZeit(){
-let n=new Date();
-datum.value=n.toLocaleDateString("de-DE")+" "+n.toLocaleTimeString("de-DE",{hour:'2-digit',minute:'2-digit'});
-}
-
-window.onload=setDatumZeit;
-
-function saveImage(e,k){
-let f=e.target.files[0];
-if(!f)return;
-let r=new FileReader();
-r.onload=x=>{
-let i=new Image();
-i.onload=()=>{
-let c=document.createElement("canvas");
-let s=800/i.width;
-c.width=800;c.height=i.height*s;
-c.getContext("2d").drawImage(i,0,0,c.width,c.height);
-images[k]=c.toDataURL("image/jpeg",0.7);
-document.getElementById("img_"+k).src=images[k];
-};
-i.src=x.target.result;
-};
-r.readAsDataURL(f);
-}
-</script>
-
+<div class="field-grid" id="pilePhotos"></div>
+<button id="generateSamples" type="button">Mischproben anlegen / Anzahl anpassen</button>
+<p class="hint">Vorhandene Einträge bleiben beim Ergänzen weiterer Mischproben erhalten.</p>
+</section>
+<section class="box" aria-labelledby="samplesTitle"><h2 id="samplesTitle">3. Mischproben</h2><div id="probenContainer"><p>Noch keine Mischproben angelegt.</p></div></section>
+</fieldset></form>
+<div class="bottom-bar"><button id="createPDF" type="button" class="primary">PDF für dieses Projekt erstellen</button><span id="activeProject">Neues Protokoll</span></div>
+</main>
+<footer>PN98-Probenahme · bauanalytix · Version 2.0</footer>
+<noscript>Bitte JavaScript aktivieren, um Protokolle zu erfassen und zu speichern.</noscript>
 </body>
 </html>
