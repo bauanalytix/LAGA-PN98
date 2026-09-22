@@ -14,8 +14,8 @@ window.PNExport = (() => {
     } catch (_) { /* Protocol content remains available if the logo cannot load. */ }
     function header() {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text(doc.splitTextToSize('PN98 · ' + fields.projNr, 120).slice(0, 2), left, 14);
-      if (logo) doc.addImage(logo.data, 'JPEG', 150, 5, 30, 30 * logo.ratio);
+      doc.text(doc.splitTextToSize('PN98 · ' + fields.projNr, 90).slice(0, 2), left, 14);
+      if (logo) doc.addImage(logo.data, 'JPEG', 120, 5, 60, 60 * logo.ratio);
       doc.setDrawColor(90); doc.line(left, 23, right, 23);
     }
     function page() { doc.addPage(); y = 32; header(); }
