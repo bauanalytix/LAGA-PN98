@@ -18,6 +18,7 @@ Für ein Update ist keine Neuinstallation nötig: die App mit Internet neu öffn
 - Unter „Gespeicherte Protokolle“ ein Projekt auswählen und „Öffnen“ drücken. Ein unvollständiges Protokoll kann jederzeit fortgesetzt werden. Auch Eingaben ohne Projektnummer werden als „Ohne Projektnummer“ gesichert.
 - „Mischproben anlegen / Anzahl anpassen“ erhält vorhandene Einträge. Beim Verkleinern wird vor dem Entfernen der betroffenen Proben und Fotos nachgefragt.
 - „PDF für dieses Projekt erstellen“ erzeugt das PDF des gerade geöffneten Projekts. Die gespeicherten Daten bleiben danach bearbeitbar.
+- Die beiden Fotos jeder Mischprobe stehen in der App und im PDF nebeneinander. Im PDF bleiben sie zusammen auf einer Seite und werden ohne Beschnitt oder Verzerrung eingepasst. Ein einzelnes Foto behält die bisherige größere Darstellung.
 - „Projekt löschen“ entfernt nach Rückfrage das geöffnete Protokoll mit seinen Fotos vom Gerät. Bereits heruntergeladene Dateien bleiben erhalten.
 
 Die gleiche Projektnummer darf nur einmal existieren; Groß-/Kleinschreibung und äußere Leerzeichen werden beim Vergleich ignoriert. Ändern zwei Tabs dasselbe Projekt, verhindert eine Versionsprüfung stilles Überschreiben. Der zweite Stand kann als separat benannte Kopie gespeichert werden.

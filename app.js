@@ -130,7 +130,7 @@
       const heading = document.createElement('h3'); heading.textContent = 'Mischprobe ' + (index + 1);
       const fields = document.createElement('div'); fields.className = 'field-grid';
       SAMPLE_FIELDS.forEach(field => fields.append(makeField(field, sample[field[0]], index + 1)));
-      const photos = document.createElement('div'); photos.className = 'field-grid';
+      const photos = document.createElement('div'); photos.className = 'field-grid sample-photos';
       photos.append(photoControl('p' + (index + 1) + '_1', 'Foto 1'), photoControl('p' + (index + 1) + '_2', 'Foto 2'));
       block.append(heading, fields, photos); container.append(block);
     });

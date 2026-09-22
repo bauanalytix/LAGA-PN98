@@ -51,6 +51,31 @@ window.PNExport = (() => {
       ensure(height + 14); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(caption, left, y); y += 5;
       doc.addImage(data, properties.fileType, left, y, width, height); y += height + 7;
     }
+    function samplePhotos(number) {
+      const entries = [1, 2].map(slot => ({
+        key: 'p' + number + '_' + slot, caption: 'Mischprobe ' + number + ' · Foto ' + slot
+      })).filter(entry => record.images[entry.key]);
+      if (entries.length < 2) {
+        entries.forEach(entry => photo(entry.key, entry.caption));
+        return;
+      }
+      const gap = 10, columnWidth = (right - left - gap) / 2;
+      const photos = entries.map(entry => {
+        const data = record.images[entry.key], properties = doc.getImageProperties(data);
+        const scale = Math.min(columnWidth / properties.width, 88 / properties.height);
+        return { ...entry, data, type: properties.fileType, width: properties.width * scale, height: properties.height * scale };
+      });
+      const height = Math.max(...photos.map(image => image.height));
+      // Keep both photographs together and preserve their original proportions.
+      ensure(height + 14);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      photos.forEach((image, column) => {
+        const x = left + column * (columnWidth + gap);
+        doc.text(image.caption, x, y);
+        doc.addImage(image.data, image.type, x + (columnWidth - image.width) / 2, y + 5, image.width, image.height);
+      });
+      y += height + 12;
+    }
     header(); heading('1. Allgemeine Daten');
     [['Projektnummer:', 'projNr'], ['Projekt:', 'projName'], ['Auftraggeber:', 'auftraggeber'], ['Ort:', 'ort'], ['Datum:', 'datum'], ['Verantwortlich:', 'verantwortlich'], ['Anlass:', 'anlass'], ['Nutzung:', 'nutzung'], ['Versiegelung:', 'versiegelung'], ['Bemerkungen:', 'bem']].forEach(([label, key]) => row(label, fields[key]));
     y += 6; heading('2. Haufwerk');
@@ -63,8 +88,7 @@ window.PNExport = (() => {
       record.samples.forEach((sample, i) => {
         page(); heading('3. Mischproben · Mischprobe ' + (i + 1));
         [['Sektor:', 'sektor'], ['ID:', 'pid'], ['Material:', 'mat'], ['Konsistenz:', 'kons'], ['Geruch:', 'ger'], ['Fremdbestandteile mineralisch:', 'fm'], ['Fremdbestandteile nicht mineralisch:', 'fn'], ['Volumen:', 'volp'], ['Position:', 'pos'], ['Art:', 'art'], ['Besonderheiten:', 'bes']].forEach(([label, key]) => row(label, sample[key]));
-        photo('p' + (i + 1) + '_1', 'Mischprobe ' + (i + 1) + ' · Foto 1');
-        photo('p' + (i + 1) + '_2', 'Mischprobe ' + (i + 1) + ' · Foto 2');
+        samplePhotos(i + 1);
       });
     } else { y += 6; heading('3. Mischproben'); }
     const pages = doc.getNumberOfPages();
